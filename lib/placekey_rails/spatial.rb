@@ -47,38 +47,43 @@ module PlacekeyRails
       RGeo::GeoJSON.encode(polygon)
     end
 
-    def polygon_to_placekeys(polygon, resolution = 10)
+    def polygon_to_placekeys(polygon, include_touching=false, geo_json=false, resolution=10)
       buffered_poly = polygon.buffer(0)
-      candidate_hexes = H3Adapter.polyfill(buffered_poly.coordinates, [], resolution)
+      # Call polyfill with the correct parameter order based on our adapter
+      candidate_hexes = H3Adapter.polyfill(buffered_poly.coordinates, resolution)
 
       interior = []
       boundary = []
 
       candidate_hexes.each do |hex|
         placekey = Converter.h3_int_to_placekey(hex)
-        if polygon.contains?(placekey_to_polygon(placekey))
+        hex_polygon = placekey_to_polygon(placekey)
+        
+        if polygon.contains?(hex_polygon)
           interior << placekey
-        elsif polygon.intersects?(placekey_to_polygon(placekey))
-          boundary << placekey
+        elsif polygon.intersects?(hex_polygon)
+          if include_touching || !polygon.touches?(hex_polygon)
+            boundary << placekey
+          end
         end
       end
 
       { interior: interior.uniq, boundary: boundary.uniq }
     end
 
-    def wkt_to_placekeys(wkt_string)
+    def wkt_to_placekeys(wkt_string, include_touching=false, geo_json=false)
       factory = RGeo::Cartesian.factory
       polygon = factory.parse_wkt(wkt_string)
-      polygon_to_placekeys(polygon)
+      polygon_to_placekeys(polygon, include_touching, geo_json)
     end
 
-    def geojson_to_placekeys(geojson)
+    def geojson_to_placekeys(geojson, include_touching=false, geo_json=true)
       poly = if geojson.is_a?(String)
         RGeo::GeoJSON.decode(geojson)
       else
         RGeo::GeoJSON.decode(geojson.to_json)
       end
-      polygon_to_placekeys(poly)
+      polygon_to_placekeys(poly, include_touching, geo_json)
     end
 
     private
