@@ -36,4 +36,8 @@ Gem::Specification.new do |spec|
   spec.add_development_dependency 'pry-rails'
   spec.add_development_dependency 'awesome_print'
   spec.add_development_dependency 'binding_of_caller'
+
+  spec.add_dependency 'jsbundling-rails'
+  spec.add_dependency 'stimulus-rails'
+  spec.add_dependency 'turbo-rails'
 end
