@@ -14,8 +14,21 @@ require "placekey_rails/client"
 
 module PlacekeyRails
   class Error < StandardError; end
-
+  
+  # Default API client used for convenience methods
+  @default_client = nil
+  
   class << self
+    # Accessor for the default client
+    attr_reader :default_client
+    
+    # Set up a default client for convenience methods
+    # @param api_key [String] The Placekey API key
+    # @param options [Hash] Additional options for the client
+    def setup_client(api_key, options = {})
+      @default_client = Client.new(api_key, options)
+    end
+    
     # Convenience methods at module level
     def geo_to_placekey(lat, long)
       Converter.geo_to_placekey(lat, long)
@@ -100,6 +113,48 @@ module PlacekeyRails
 
     def return_free_dataset_joins_by_name(names, url: false)
       Client.return_free_dataset_joins_by_name(names, url: url)
+    end
+    
+    # Additional API client convenience methods that require an initialized client
+    
+    # Look up a placekey for a location
+    # @param params [Hash] The location parameters
+    # @param fields [Array] Optional fields to request
+    # @return [Hash] The API response
+    def lookup_placekey(params, fields = nil)
+      ensure_client_setup
+      default_client.lookup_placekey(params, fields)
+    end
+    
+    # Look up placekeys for multiple locations
+    # @param places [Array<Hash>] The locations
+    # @param fields [Array] Optional fields to request
+    # @param batch_size [Integer] Batch size for requests
+    # @param verbose [Boolean] Whether to log detailed information
+    # @return [Array<Hash>] The API responses
+    def lookup_placekeys(places, fields = nil, batch_size = 100, verbose = false)
+      ensure_client_setup
+      default_client.lookup_placekeys(places, fields, batch_size, verbose)
+    end
+    
+    # Process a dataframe with the Placekey API
+    # @param dataframe [Rover::DataFrame] The DataFrame to process
+    # @param column_mapping [Hash] Mapping from API fields to DataFrame columns
+    # @param fields [Array] Optional fields to request
+    # @param batch_size [Integer] Batch size for requests
+    # @param verbose [Boolean] Whether to log detailed information
+    # @return [Rover::DataFrame] The processed DataFrame
+    def placekey_dataframe(dataframe, column_mapping, fields = nil, batch_size = 100, verbose = false)
+      ensure_client_setup
+      default_client.placekey_dataframe(dataframe, column_mapping, fields, batch_size, verbose)
+    end
+    
+    private
+    
+    def ensure_client_setup
+      unless default_client
+        raise Error, "Default API client not set up. Call PlacekeyRails.setup_client(api_key) first."
+      end
     end
   end
 end
