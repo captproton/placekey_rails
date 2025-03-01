@@ -1,9 +1,16 @@
 require 'rails_helper'
 
-# Mock Rover::DataFrame for testing
+# Create a dummy DataFrame class for testing
 module Rover
   class DataFrame
-    # This is just a mock class for testing
+    # Define methods to match what we'll be mocking
+    def [](key); end
+    def []=(key, value); end
+    def has_column?(column); end
+    def join(other, options={}); end
+    def delete(column); end
+    def rename(mapping); end
+    def each_row_with_index; end
   end
 end
 
@@ -12,27 +19,32 @@ RSpec.describe PlacekeyRails::Client, "DataFrame Integration" do
   let(:client) { described_class.new(api_key) }
   let(:logger) { instance_double(ActiveSupport::Logger, info: nil, error: nil) }
   
-  # Mock Rover::DataFrame for testing
-  let(:dataframe) do
-    df = instance_double(Rover::DataFrame)
-    allow(df).to receive(:[]).and_return(df)
-    allow(df).to receive(:[]=)
-    allow(df).to receive(:has_column?).and_return(true)
-    allow(df).to receive(:join).and_return(df)
-    allow(df).to receive(:delete).and_return(df)
-    allow(df).to receive(:rename).and_return(df)
-    
-    # Create a method for each_row_with_index that yields a row and index
-    row_data = [
+  # Create mock data and DataFrame directly
+  let(:row_data) do
+    [
       { 'lat' => 37.7371, 'lng' => -122.44283, 'address' => '123 Main St' },
       { 'lat' => 37.7373, 'lng' => -122.44284, 'address' => '456 Oak Ave' }
     ]
+  end
+  
+  let(:dataframe) do
+    # Use double instead of instance_double to avoid method verification
+    df = double("Rover::DataFrame")
     
+    # Set up basic behaviors
+    allow(df).to receive(:[]) { df }
+    allow(df).to receive(:[]=)
+    allow(df).to receive(:has_column?) { true }
+    allow(df).to receive(:join) { df }
+    allow(df).to receive(:delete) { df }
+    allow(df).to receive(:rename) { df }
+    
+    # Set up row iteration
     allow(df).to receive(:each_row_with_index) do |&block|
-      row_data.each_with_index do |row, i|
-        row_obj = instance_double("Rover::DataFrame::Row")
-        allow(row_obj).to receive(:[]) { |key| row[key] }
-        block.call(row_obj, i)
+      row_data.each_with_index do |data, i|
+        row = double("Row")
+        allow(row).to receive(:[]) { |key| data[key] }
+        block.call(row, i)
       end
     end
     
