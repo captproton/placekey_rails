@@ -20,3 +20,5 @@ gem "jsbundling-rails", "~> 1.3"
 gem "stimulus-rails", "~> 1.3"
 
 gem "turbo-rails", "~> 2.0"
+
+gem "tailwindcss-rails", "~> 4.1"

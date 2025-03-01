@@ -40,4 +40,6 @@ Gem::Specification.new do |spec|
   spec.add_dependency 'jsbundling-rails'
   spec.add_dependency 'stimulus-rails'
   spec.add_dependency 'turbo-rails'
+
+  spec.add_dependency 'tailwindcss-rails'
 end
