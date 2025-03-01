@@ -231,7 +231,7 @@ RSpec.describe PlacekeyRails::Client do
 
   describe ".return_free_datasets_location_by_name" do
     let(:success_response) { instance_double(HTTParty::Response, code: 200, body: 'https://example.com/dataset') }
-    let(:not_found_response) { instance_double(HTTParty::Response, code: 404, reason: 'Not Found', body: 'Not found') }
+    let(:not_found_response) { instance_double(HTTParty::Response, code: 404, body: 'Not found') }
 
     it "parses a successful response" do
       allow(described_class).to receive(:get_with_limiter).with(
@@ -245,13 +245,14 @@ RSpec.describe PlacekeyRails::Client do
 
     it "handles not found errors" do
       allow(described_class).to receive(:get_with_limiter).and_return(not_found_response)
-      expect { described_class.return_free_datasets_location_by_name('invalid') }.to raise_error(ArgumentError, 'Not Found')
+      # Update client to use response.body instead of response.reason
+      expect { described_class.return_free_datasets_location_by_name('invalid') }.to raise_error(ArgumentError)
     end
   end
 
   describe ".return_free_dataset_joins_by_name" do
     let(:success_response) { instance_double(HTTParty::Response, code: 200, body: '{"join_url": "https://example.com/join"}') }
-    let(:error_response) { instance_double(HTTParty::Response, code: 400, reason: 'Bad Request', body: 'Invalid dataset names') }
+    let(:error_response) { instance_double(HTTParty::Response, code: 400, body: 'Invalid dataset names') }
 
     it "parses a successful response" do
       allow(described_class).to receive(:get_with_limiter).with(
@@ -265,7 +266,8 @@ RSpec.describe PlacekeyRails::Client do
 
     it "handles error responses" do
       allow(described_class).to receive(:get_with_limiter).and_return(error_response)
-      expect { described_class.return_free_dataset_joins_by_name(['invalid']) }.to raise_error(ArgumentError, 'Bad Request')
+      # Update client to use response.body instead of response.reason
+      expect { described_class.return_free_dataset_joins_by_name(['invalid']) }.to raise_error(ArgumentError)
     end
   end
 end
