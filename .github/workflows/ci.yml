@@ -18,6 +18,9 @@ jobs:
           ruby-version: ruby-3.2.2
           bundler-cache: true
 
+      - name: Update bundle platforms
+        run: bundle lock --add-platform x86_64-linux
+
       - name: Lint code for consistent style
         run: bin/rubocop -f github
 
@@ -41,6 +44,9 @@ jobs:
         with:
           ruby-version: ${{ matrix.ruby-version }}
           bundler-cache: true # runs 'bundle install' and caches installed gems automatically
+      
+      - name: Update bundle platforms
+        run: bundle lock --add-platform x86_64-linux
       
       - name: Set up test database
         run: |
