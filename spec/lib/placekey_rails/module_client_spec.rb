@@ -4,6 +4,11 @@ require 'rails_helper'
 unless defined?(Rover) && defined?(Rover::DataFrame)
   module Rover
     class DataFrame
+      # Define proper initialization method with data argument
+      def initialize(data = nil)
+        # This is just a mock constructor
+      end
+      
       # Define methods we'll need for mocking
       def [](key); end
       def []=(key, value); end

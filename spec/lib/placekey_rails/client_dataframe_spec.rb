@@ -3,6 +3,11 @@ require 'rails_helper'
 # Create a dummy DataFrame class for testing
 module Rover
   class DataFrame
+    # Define proper initialization method with data argument
+    def initialize(data = nil)
+      # This is just a mock constructor
+    end
+    
     # Define methods to match what we'll be mocking
     def [](key); end
     def []=(key, value); end
@@ -50,10 +55,27 @@ RSpec.describe PlacekeyRails::Client, "DataFrame Integration" do
     
     df
   end
+  
+  # Create a mock for the result DataFrame
+  let(:result_df) do
+    df = double("Rover::DataFrame")
+    allow(df).to receive(:rename) { df }
+    df
+  end
 
   before do
     allow(client).to receive(:logger).and_return(logger)
-    allow(Rover::DataFrame).to receive(:new).and_return(dataframe)
+    
+    # Handle DataFrame.new with results
+    allow(Rover::DataFrame).to receive(:new) do |arg|
+      if arg.is_a?(Array)
+        # Return our result_df when called with array data
+        result_df
+      else
+        # Otherwise return the regular dataframe
+        dataframe
+      end
+    end
   end
 
   describe "#placekey_dataframe" do
