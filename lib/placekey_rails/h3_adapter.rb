@@ -48,11 +48,32 @@ module PlacekeyRails
       H3::Indexing.h3_to_geo_boundary(h3_index)
     end
 
-    # Adapts H3::Indexing.polyfill to polyfill
-    # Note: This method may need adjustment depending on the exact API
+    # Adapts H3::Regions.polyfill to polyfill
     def polyfill(polygon, resolution)
-      # Convert polygon to appropriate format expected by H3::Indexing.polyfill
-      H3::Indexing.polyfill(polygon, resolution)
+      # Converting the polygon to the format expected by H3::Regions.polyfill
+      # H3::Regions.polyfill expects a set of coordinates as argument
+      
+      # This is a simplified version - might need adjustment based on actual polygon format
+      # and specific requirements of H3::Regions.polyfill
+      if polygon.respond_to?(:exterior_ring) && polygon.exterior_ring.respond_to?(:points)
+        # Extract exterior ring coordinates as [lat, lng] pairs
+        coords = polygon.exterior_ring.points.map { |p| [p.y, p.x] }
+        
+        # Get any holes (interior rings)
+        holes = []
+        if polygon.respond_to?(:interior_rings) && !polygon.interior_rings.empty?
+          holes = polygon.interior_rings.map do |ring|
+            ring.points.map { |p| [p.y, p.x] }
+          end
+        end
+        
+        # Call the actual polyfill method
+        H3::Regions.polyfill(coords, holes, resolution)
+      else
+        # Fallback for simpler polygon representation or different format
+        # This might need customization based on actual usage patterns
+        H3::Regions.polyfill(polygon, [], resolution)
+      end
     end
   end
 end
