@@ -81,9 +81,12 @@ GEM
     addressable (2.8.7)
       public_suffix (>= 2.0.2, < 7.0)
     ast (2.4.2)
+    awesome_print (1.9.2)
     base64 (0.2.0)
     benchmark (0.4.0)
     bigdecimal (3.1.9)
+    binding_of_caller (1.0.1)
+      debug_inspector (>= 1.2.0)
     builder (3.3.0)
     capybara (3.40.0)
       addressable
@@ -99,6 +102,7 @@ GEM
     connection_pool (2.5.0)
     crass (1.0.6)
     date (3.4.1)
+    debug_inspector (1.2.0)
     diff-lcs (1.6.0)
     drb (2.2.1)
     erubi (1.13.1)
@@ -206,6 +210,11 @@ GEM
     pry (0.15.2)
       coderay (~> 1.1)
       method_source (~> 1.0)
+    pry-doc (1.5.0)
+      pry (~> 0.11)
+      yard (~> 0.9.11)
+    pry-rails (0.3.11)
+      pry (>= 0.13.0)
     psych (5.2.3)
       date
       stringio
@@ -335,6 +344,7 @@ GEM
     websocket-extensions (0.1.5)
     xpath (3.2.0)
       nokogiri (~> 1.8)
+    yard (0.9.37)
     zeitwerk (2.7.2)
 
 PLATFORMS
@@ -348,11 +358,15 @@ PLATFORMS
   x86_64-linux-musl
 
 DEPENDENCIES
+  awesome_print
+  binding_of_caller
   capybara
   guard-rails
   guard-rspec
   placekey_rails!
   propshaft
+  pry-doc
+  pry-rails
   puma
   rspec-rails
   rubocop-rails-omakase

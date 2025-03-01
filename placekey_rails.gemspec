@@ -30,4 +30,10 @@ Gem::Specification.new do |spec|
 
   spec.add_development_dependency 'guard-rspec'
   spec.add_development_dependency 'guard-rails'
+
+  spec.add_development_dependency 'puma'
+  spec.add_development_dependency 'pry-doc'
+  spec.add_development_dependency 'pry-rails'
+  spec.add_development_dependency 'awesome_print'
+  spec.add_development_dependency 'binding_of_caller'
 end
