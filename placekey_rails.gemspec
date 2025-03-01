@@ -24,9 +24,9 @@ Gem::Specification.new do |spec|
   end
 
   spec.add_dependency "rails", ">= 8.0.1"
-  spec.add_dependency 'h3', '~> 3.7', '>= 3.7.2'     # Ruby wrapper for H3
-  spec.add_dependency "rgeo", '~> 3.0', '>= 3.0.1'        # For spatial operations
-  spec.add_dependency "rgeo-geojson", "~> 2.2.0"  # For GeoJSON support
+  spec.add_dependency "h3", "~> 3.7.2"  # Latest H3 from master branch
+  spec.add_dependency "rgeo", "~> 3.0"
+  spec.add_dependency "rgeo-geojson", "~> 2.2"
   spec.add_dependency "httparty", "~> 0.22.0"   # For API calls
   spec.add_dependency "rover-df", "~> 0.4.1"      # For DataFrame operations (similar to pandas)
 

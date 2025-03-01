@@ -1,4 +1,5 @@
 source "https://rubygems.org"
+git_source(:github) { |repo| "https://github.com/#{repo}.git" }
 
 # Specify your gem's dependencies in placekey_rails.gemspec.
 gemspec
@@ -17,6 +18,9 @@ gem "jsbundling-rails", "~> 1.3.1"
 gem "stimulus-rails", "~> 1.3.4"
 gem "turbo-rails", "~> 2.0.11"
 gem "tailwindcss-rails", "~> 4.1"
+
+# Use the stable version from RubyGems
+gem "h3", "~> 3.7.2"
 
 group :development, :test do
   gem "rspec-rails", "~> 7.1.1"
