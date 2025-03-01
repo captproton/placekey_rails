@@ -10,6 +10,7 @@ require "placekey_rails/h3_adapter"
 require "placekey_rails/converter"
 require "placekey_rails/validator"
 require "placekey_rails/spatial"
+require "placekey_rails/client"
 
 module PlacekeyRails
   class Error < StandardError; end
@@ -86,6 +87,19 @@ module PlacekeyRails
 
     def geojson_to_placekeys(geojson, include_touching=false, geo_json=true)
       Spatial.geojson_to_placekeys(geojson, include_touching, geo_json)
+    end
+
+    # API Client convenience methods
+    def list_free_datasets
+      Client.list_free_datasets
+    end
+
+    def return_free_datasets_location_by_name(name, url: false)
+      Client.return_free_datasets_location_by_name(name, url: url)
+    end
+
+    def return_free_dataset_joins_by_name(names, url: false)
+      Client.return_free_dataset_joins_by_name(names, url: url)
     end
   end
 end

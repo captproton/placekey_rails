@@ -8,7 +8,7 @@ module PlacekeyRails
   module H3Adapter
     extend self
 
-    # Core indexing functions
+    # Core indexing functions with snake_case names (Ruby style)
     def lat_lng_to_cell(lat, lng, resolution)
       H3.from_geo_coordinates([lat, lng], resolution)
     end
@@ -41,5 +41,15 @@ module PlacekeyRails
       # H3 gem's polyfill doesn't use holes parameter
       H3.polyfill(coordinates, resolution)
     end
+
+    # Aliases for camelCase style (Python/JavaScript style)
+    # Used primarily for testing compatibility
+    alias :latLngToCell :lat_lng_to_cell
+    alias :cellToLatLng :cell_to_lat_lng
+    alias :stringToH3 :string_to_h3
+    alias :h3ToString :h3_to_string
+    alias :isValidCell :is_valid_cell
+    alias :gridDisk :grid_disk
+    alias :cellToBoundary :cell_to_boundary
   end
 end
