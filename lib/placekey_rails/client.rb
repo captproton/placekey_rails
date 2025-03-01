@@ -182,7 +182,8 @@ module PlacekeyRails
       when 200
         response.body
       when 400..499
-        raise ArgumentError, response.reason
+        # Use response.body instead of response.reason for error message
+        raise ArgumentError, "API Error: #{response.body}"
       else
         raise ApiError.new(response.code, "Something went wrong. Please contact Placekey.")
       end
@@ -198,7 +199,8 @@ module PlacekeyRails
       when 200
         JSON.parse(response.body)
       when 400..499
-        raise ArgumentError, response.reason
+        # Use response.body instead of response.reason for error message
+        raise ArgumentError, "API Error: #{response.body}"
       else
         raise ApiError.new(response.code, "Something went wrong. Please contact Placekey.")
       end

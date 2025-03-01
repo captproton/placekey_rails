@@ -35,8 +35,10 @@ module PlacekeyRails
       H3.to_boundary(h3_index)
     end
 
-    def polyfill(coordinates, resolution)
+    # The polyfill method - we ignore the holes parameter since H3 gem doesn't support it
+    def polyfill(coordinates, holes=nil, resolution)
       # Use the H3 gem's polyfill method with coordinates and resolution
+      # Ignore the holes parameter since it's not supported by the H3 gem
       H3.polyfill(coordinates, resolution)
     end
 

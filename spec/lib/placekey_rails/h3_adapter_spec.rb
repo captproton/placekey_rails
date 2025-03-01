@@ -79,8 +79,10 @@ RSpec.describe PlacekeyRails::H3Adapter do
     let(:resolution) { 10 }
 
     it 'fills polygon with H3 cells' do
-      result = described_class.polyfill(coordinates, [], resolution)
+      # Our adapter ignores the holes parameter but accepts it for compatibility
+      result = described_class.polyfill(coordinates, nil, resolution)
       expect(result).to eq([123456789, 123456790])
+      # The H3 gem's polyfill only takes coordinates and resolution
       expect(h3).to have_received(:polyfill).with(coordinates, resolution)
     end
   end
