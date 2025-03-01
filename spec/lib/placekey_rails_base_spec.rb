@@ -12,24 +12,34 @@ RSpec.describe PlacekeyRails do
     adapter_mock.define_singleton_method(:h3_to_string) { |h3| "8a2830828767fff" }
     adapter_mock.define_singleton_method(:is_valid_cell) { |h3| true }
     
-    # Create aliases for camelCase methods
-    adapter_mock.define_singleton_method(:latLngToCell) { |lat, lng, res| lat_lng_to_cell(lat, lng, res) }
-    adapter_mock.define_singleton_method(:cellToLatLng) { |h3| cell_to_lat_lng(h3) }
-    adapter_mock.define_singleton_method(:stringToH3) { |str| string_to_h3(str) }
-    adapter_mock.define_singleton_method(:h3ToString) { |h3| h3_to_string(h3) }
-    adapter_mock.define_singleton_method(:isValidCell) { |h3| is_valid_cell(h3) }
+    # Define camelCase methods directly since we can't use method_alias in a dynamic module
+    adapter_mock.define_singleton_method(:latLngToCell) { |lat, lng, res| 123456789 }
+    adapter_mock.define_singleton_method(:cellToLatLng) { |h3| [37.7371, -122.44283] }
+    adapter_mock.define_singleton_method(:stringToH3) { |str| 123456789 }
+    adapter_mock.define_singleton_method(:h3ToString) { |h3| "8a2830828767fff" }
+    adapter_mock.define_singleton_method(:isValidCell) { |h3| true }
+    adapter_mock.define_singleton_method(:gridDisk) { |h3, k| [123456789, 123456790, 123456791] }
+    adapter_mock.define_singleton_method(:cellToBoundary) { |h3| [[37.7371, -122.44283], [37.7373, -122.44284], [37.7375, -122.44283], [37.7375, -122.44281], [37.7373, -122.44280], [37.7371, -122.44281]] }
     
     # Stub the H3Adapter constant
     stub_const("PlacekeyRails::H3Adapter", adapter_mock)
     
     # Set up converter and other mocks
-    allow(PlacekeyRails::Converter).to receive(:geo_to_placekey).and_return("@5vg-82n-kzz")
-    allow(PlacekeyRails::Converter).to receive(:placekey_to_geo).and_return([37.7371, -122.44283])
-    allow(PlacekeyRails::Converter).to receive(:h3_to_placekey).and_return("@5vg-82n-kzz")
-    allow(PlacekeyRails::Converter).to receive(:placekey_to_h3).and_return("8a2830828767fff")
-    allow(PlacekeyRails::Validator).to receive(:placekey_format_is_valid).and_return(true)
-    allow(PlacekeyRails::Spatial).to receive(:get_neighboring_placekeys).and_return(Set.new(["@5vg-82n-kzz"]))
-    allow(PlacekeyRails::Spatial).to receive(:placekey_distance).and_return(1242.8)
+    converter_mock = Module.new
+    converter_mock.define_singleton_method(:geo_to_placekey) { |lat, lng| "@5vg-82n-kzz" }
+    converter_mock.define_singleton_method(:placekey_to_geo) { |placekey| [37.7371, -122.44283] }
+    converter_mock.define_singleton_method(:h3_to_placekey) { |h3_string| "@5vg-82n-kzz" }
+    converter_mock.define_singleton_method(:placekey_to_h3) { |placekey| "8a2830828767fff" }
+    stub_const("PlacekeyRails::Converter", converter_mock)
+    
+    validator_mock = Module.new
+    validator_mock.define_singleton_method(:placekey_format_is_valid) { |placekey| true }
+    stub_const("PlacekeyRails::Validator", validator_mock)
+    
+    spatial_mock = Module.new
+    spatial_mock.define_singleton_method(:get_neighboring_placekeys) { |placekey, dist=1| Set.new(["@5vg-82n-kzz"]) }
+    spatial_mock.define_singleton_method(:placekey_distance) { |placekey_1, placekey_2| 1242.8 }
+    stub_const("PlacekeyRails::Spatial", spatial_mock)
   end
   
   it "has constants defined for Placekey encoding" do
