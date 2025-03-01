@@ -1,5 +1,5 @@
 begin
-  require 'h3'
+  require "h3"
 rescue LoadError => e
   warn "H3 gem loading failed: #{e.message}"
   warn "Installing system dependencies..."

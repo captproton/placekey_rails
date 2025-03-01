@@ -5,7 +5,7 @@ RSpec.describe PlacekeyRails::Converter do
 
   before do
     allow(h3_adapter).to receive(:lat_lng_to_cell).and_return(123456789)
-    allow(h3_adapter).to receive(:cell_to_lat_lng).and_return([37.7371, -122.44283])
+    allow(h3_adapter).to receive(:cell_to_lat_lng).and_return([ 37.7371, -122.44283 ])
     allow(h3_adapter).to receive(:string_to_h3).and_return(123456789)
     allow(h3_adapter).to receive(:h3_to_string).and_return("8a2830828767fff")
     allow(h3_adapter).to receive(:is_valid_cell).and_return(true)

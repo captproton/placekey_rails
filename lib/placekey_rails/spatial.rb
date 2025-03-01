@@ -1,7 +1,7 @@
-require 'set'
-require 'placekey_rails/constants'
-require 'placekey_rails/h3_adapter'
-require 'placekey_rails/converter'
+require "set"
+require "placekey_rails/constants"
+require "placekey_rails/h3_adapter"
+require "placekey_rails/converter"
 
 module PlacekeyRails
   module Spatial
@@ -24,7 +24,7 @@ module PlacekeyRails
       boundary = H3Adapter.cell_to_boundary(h3_integer)
 
       if geo_json
-        boundary.map { |coord| [coord[1], coord[0]] }
+        boundary.map { |coord| [ coord[1], coord[0] ] }
       else
         boundary
       end
@@ -37,7 +37,7 @@ module PlacekeyRails
       factory.polygon(factory.linear_ring(points))
     end
 
-    def placekey_to_wkt(placekey, geo_json=false)
+    def placekey_to_wkt(placekey, geo_json = false)
       polygon = placekey_to_polygon(placekey)
       polygon.as_text
     end
@@ -47,7 +47,7 @@ module PlacekeyRails
       RGeo::GeoJSON.encode(polygon)
     end
 
-    def polygon_to_placekeys(polygon, include_touching=false, geo_json=false, resolution=10)
+    def polygon_to_placekeys(polygon, include_touching = false, geo_json = false, resolution = 10)
       buffered_poly = polygon.buffer(0)
       # Call polyfill with the correct parameter order based on our adapter
       candidate_hexes = H3Adapter.polyfill(buffered_poly.coordinates, resolution)
@@ -58,7 +58,7 @@ module PlacekeyRails
       candidate_hexes.each do |hex|
         placekey = Converter.h3_int_to_placekey(hex)
         hex_polygon = placekey_to_polygon(placekey)
-        
+
         if polygon.contains?(hex_polygon)
           interior << placekey
         elsif polygon.intersects?(hex_polygon)
@@ -71,13 +71,13 @@ module PlacekeyRails
       { interior: interior.uniq, boundary: boundary.uniq }
     end
 
-    def wkt_to_placekeys(wkt_string, include_touching=false, geo_json=false)
+    def wkt_to_placekeys(wkt_string, include_touching = false, geo_json = false)
       factory = RGeo::Cartesian.factory
       polygon = factory.parse_wkt(wkt_string)
       polygon_to_placekeys(polygon, include_touching, geo_json)
     end
 
-    def geojson_to_placekeys(geojson, include_touching=false, geo_json=true)
+    def geojson_to_placekeys(geojson, include_touching = false, geo_json = true)
       poly = if geojson.is_a?(String)
         RGeo::GeoJSON.decode(geojson)
       else

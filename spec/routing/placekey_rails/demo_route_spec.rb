@@ -7,7 +7,7 @@ RSpec.describe 'Demo route', type: :routing do
   it 'routes to the demo page' do
     expect(get: '/dummy_rails7_testing/index').to be_routable
   end
-  
+
   it 'mounts the engine' do
     expect(get: '/placekey_rails').to be_routable
   end

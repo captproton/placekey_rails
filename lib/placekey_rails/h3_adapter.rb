@@ -1,4 +1,4 @@
-require 'h3'
+require "h3"
 
 module PlacekeyRails
   # This adapter module provides a bridge between the actual H3 gem methods
@@ -8,7 +8,7 @@ module PlacekeyRails
 
     # Core methods using the actual H3 gem method names
     def lat_lng_to_cell(lat, lng, resolution)
-      H3.from_geo_coordinates([lat, lng], resolution)
+      H3.from_geo_coordinates([ lat, lng ], resolution)
     end
 
     def cell_to_lat_lng(h3_index)
@@ -36,7 +36,7 @@ module PlacekeyRails
     end
 
     # The polyfill method - we ignore the holes parameter since H3 gem doesn't support it
-    def polyfill(coordinates, holes=nil, resolution)
+    def polyfill(coordinates, holes = nil, resolution)
       # Use the H3 gem's polyfill method with coordinates and resolution
       # Ignore the holes parameter since it's not supported by the H3 gem
       H3.polyfill(coordinates, resolution)

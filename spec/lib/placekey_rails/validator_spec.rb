@@ -6,11 +6,11 @@ RSpec.describe PlacekeyRails::Validator do
     h3_adapter = Module.new
     h3_adapter.define_singleton_method(:is_valid_cell) { |_h3_index| true }
     h3_adapter.define_singleton_method(:string_to_h3) { |_h3_string| 123456789 }
-    
+
     converter = Module.new
     converter.define_singleton_method(:placekey_to_h3) { |_placekey| "8a2830828767fff" }
     converter.define_singleton_method(:placekey_to_h3_int) { |_placekey| 123456789 }
-    
+
     # Stub the real constants with our mocks
     stub_const("PlacekeyRails::H3Adapter", h3_adapter)
     stub_const("PlacekeyRails::Converter", converter)
@@ -52,7 +52,7 @@ RSpec.describe PlacekeyRails::Validator do
       h3_adapter.define_singleton_method(:is_valid_cell) { |_h3_index| false }
       h3_adapter.define_singleton_method(:string_to_h3) { |_h3_string| 123456789 }
       stub_const("PlacekeyRails::H3Adapter", h3_adapter)
-      
+
       result = described_class.where_part_is_valid("5vg-7gq-tvz")
       expect(result).to be false
     end
@@ -63,7 +63,7 @@ RSpec.describe PlacekeyRails::Validator do
       converter.define_singleton_method(:placekey_to_h3) { |_placekey| raise StandardError }
       converter.define_singleton_method(:placekey_to_h3_int) { |_placekey| 123456789 }
       stub_const("PlacekeyRails::Converter", converter)
-      
+
       result = described_class.where_part_is_valid("5vg-7gq-tvz")
       expect(result).to be false
     end
@@ -89,7 +89,7 @@ RSpec.describe PlacekeyRails::Validator do
       h3_adapter.define_singleton_method(:is_valid_cell) { |_h3_index| raise StandardError }
       h3_adapter.define_singleton_method(:string_to_h3) { |_h3_string| 123456789 }
       stub_const("PlacekeyRails::H3Adapter", h3_adapter)
-      
+
       result = described_class.where_part_is_valid("5vg-7gq-tvz")
       expect(result).to be false
     end

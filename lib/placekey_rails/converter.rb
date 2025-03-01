@@ -1,5 +1,5 @@
-require 'placekey_rails/constants'
-require 'placekey_rails/h3_adapter'
+require "placekey_rails/constants"
+require "placekey_rails/h3_adapter"
 
 module PlacekeyRails
   module Converter
@@ -36,16 +36,16 @@ module PlacekeyRails
     end
 
     def parse_placekey(placekey)
-      if placekey.include?('@')
-        parts = placekey.split('@')
+      if placekey.include?("@")
+        parts = placekey.split("@")
         if parts.first.empty?
           # Handle the case where @ is at the beginning (no "what" part)
-          [nil, parts.last]
+          [ nil, parts.last ]
         else
-          [parts.first, parts.last]
+          [ parts.first, parts.last ]
         end
       else
-        [nil, placekey]
+        [ nil, placekey ]
       end
     end
 
@@ -60,13 +60,13 @@ module PlacekeyRails
         clean_encoded_short_h3 = clean_encoded_short_h3.rjust(PlacekeyRails::CODE_LENGTH, PlacekeyRails::PADDING_CHAR)
       end
 
-      '@' + clean_encoded_short_h3.scan(/.{#{PlacekeyRails::TUPLE_LENGTH}}/).join('-')
+      "@" + clean_encoded_short_h3.scan(/.{#{PlacekeyRails::TUPLE_LENGTH}}/).join("-")
     end
 
     def encode_short_int(x)
       return PlacekeyRails::ALPHABET[0] if x == 0
 
-      result = ''
+      result = ""
       while x > 0
         remainder = x % PlacekeyRails::ALPHABET_LENGTH
         result = PlacekeyRails::ALPHABET[remainder] + result
@@ -91,7 +91,7 @@ module PlacekeyRails
     end
 
     def strip_encoding(s)
-      s.gsub('@', '').gsub('-', '').gsub(PlacekeyRails::PADDING_CHAR, '')
+      s.gsub("@", "").gsub("-", "").gsub(PlacekeyRails::PADDING_CHAR, "")
     end
 
     def shorten_h3_integer(h3_integer)
@@ -117,7 +117,7 @@ module PlacekeyRails
 
     def get_header_int
       # Calculate header_int from the H3 index of (0,0)
-      h3_binary = H3Adapter.lat_lng_to_cell(0.0, 0.0, PlacekeyRails::RESOLUTION).to_s(2).rjust(64, '0')
+      h3_binary = H3Adapter.lat_lng_to_cell(0.0, 0.0, PlacekeyRails::RESOLUTION).to_s(2).rjust(64, "0")
       header_bits = h3_binary[0..11]
 
       header_int = 0

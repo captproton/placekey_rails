@@ -14,21 +14,21 @@ require "placekey_rails/client"
 
 module PlacekeyRails
   class Error < StandardError; end
-  
+
   # Default API client used for convenience methods
   @default_client = nil
-  
+
   class << self
     # Accessor for the default client
     attr_reader :default_client
-    
+
     # Set up a default client for convenience methods
     # @param api_key [String] The Placekey API key
     # @param options [Hash] Additional options for the client
     def setup_client(api_key, options = {})
       @default_client = Client.new(api_key, options)
     end
-    
+
     # Convenience methods at module level
     def geo_to_placekey(lat, long)
       Converter.geo_to_placekey(lat, long)
@@ -50,7 +50,7 @@ module PlacekeyRails
       Validator.placekey_format_is_valid(placekey)
     end
 
-    def get_neighboring_placekeys(placekey, dist=1)
+    def get_neighboring_placekeys(placekey, dist = 1)
       Spatial.get_neighboring_placekeys(placekey, dist)
     end
 
@@ -74,15 +74,15 @@ module PlacekeyRails
     end
 
     # Additional convenience methods for spatial operations
-    def placekey_to_hex_boundary(placekey, geo_json=false)
+    def placekey_to_hex_boundary(placekey, geo_json = false)
       Spatial.placekey_to_hex_boundary(placekey, geo_json)
     end
 
-    def placekey_to_polygon(placekey, geo_json=false)
+    def placekey_to_polygon(placekey, geo_json = false)
       Spatial.placekey_to_polygon(placekey, geo_json)
     end
 
-    def placekey_to_wkt(placekey, geo_json=false)
+    def placekey_to_wkt(placekey, geo_json = false)
       Spatial.placekey_to_wkt(placekey, geo_json)
     end
 
@@ -90,15 +90,15 @@ module PlacekeyRails
       Spatial.placekey_to_geojson(placekey)
     end
 
-    def polygon_to_placekeys(poly, include_touching=false, geo_json=false)
+    def polygon_to_placekeys(poly, include_touching = false, geo_json = false)
       Spatial.polygon_to_placekeys(poly, include_touching, geo_json)
     end
 
-    def wkt_to_placekeys(wkt, include_touching=false, geo_json=false)
+    def wkt_to_placekeys(wkt, include_touching = false, geo_json = false)
       Spatial.wkt_to_placekeys(wkt, include_touching, geo_json)
     end
 
-    def geojson_to_placekeys(geojson, include_touching=false, geo_json=true)
+    def geojson_to_placekeys(geojson, include_touching = false, geo_json = true)
       Spatial.geojson_to_placekeys(geojson, include_touching, geo_json)
     end
 
@@ -114,9 +114,9 @@ module PlacekeyRails
     def return_free_dataset_joins_by_name(names, url: false)
       Client.return_free_dataset_joins_by_name(names, url: url)
     end
-    
+
     # Additional API client convenience methods that require an initialized client
-    
+
     # Look up a placekey for a location
     # @param params [Hash] The location parameters
     # @param fields [Array] Optional fields to request
@@ -125,7 +125,7 @@ module PlacekeyRails
       ensure_client_setup
       default_client.lookup_placekey(params, fields)
     end
-    
+
     # Look up placekeys for multiple locations
     # @param places [Array<Hash>] The locations
     # @param fields [Array] Optional fields to request
@@ -136,7 +136,7 @@ module PlacekeyRails
       ensure_client_setup
       default_client.lookup_placekeys(places, fields, batch_size, verbose)
     end
-    
+
     # Process a dataframe with the Placekey API
     # @param dataframe [Rover::DataFrame] The DataFrame to process
     # @param column_mapping [Hash] Mapping from API fields to DataFrame columns
@@ -148,9 +148,9 @@ module PlacekeyRails
       ensure_client_setup
       default_client.placekey_dataframe(dataframe, column_mapping, fields, batch_size, verbose)
     end
-    
+
     private
-    
+
     def ensure_client_setup
       unless default_client
         raise Error, "Default API client not set up. Call PlacekeyRails.setup_client(api_key) first."

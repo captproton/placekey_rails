@@ -68,24 +68,24 @@ RSpec.describe PlacekeyRails::Client do
 
   describe "#has_minimum_inputs?" do
     it "accepts latitude and longitude" do
-      expect(client.send(:has_minimum_inputs?, ['latitude', 'longitude'])).to be true
+      expect(client.send(:has_minimum_inputs?, [ 'latitude', 'longitude' ])).to be true
     end
 
     it "accepts full address" do
-      expect(client.send(:has_minimum_inputs?, ['street_address', 'city', 'region', 'postal_code'])).to be true
+      expect(client.send(:has_minimum_inputs?, [ 'street_address', 'city', 'region', 'postal_code' ])).to be true
     end
 
     it "accepts address with region and postal code" do
-      expect(client.send(:has_minimum_inputs?, ['street_address', 'region', 'postal_code'])).to be true
+      expect(client.send(:has_minimum_inputs?, [ 'street_address', 'region', 'postal_code' ])).to be true
     end
 
     it "accepts address with region and city" do
-      expect(client.send(:has_minimum_inputs?, ['street_address', 'region', 'city'])).to be true
+      expect(client.send(:has_minimum_inputs?, [ 'street_address', 'region', 'city' ])).to be true
     end
 
     it "rejects insufficient inputs" do
-      expect(client.send(:has_minimum_inputs?, ['street_address'])).to be false
-      expect(client.send(:has_minimum_inputs?, ['city', 'region'])).to be false
+      expect(client.send(:has_minimum_inputs?, [ 'street_address' ])).to be false
+      expect(client.send(:has_minimum_inputs?, [ 'city', 'region' ])).to be false
     end
   end
 
@@ -168,7 +168,7 @@ RSpec.describe PlacekeyRails::Client do
 
     it "handles errors in a batch" do
       allow(client).to receive(:lookup_batch).and_return({ 'error' => 'Batch error' })
-      
+
       results = client.lookup_placekeys(places)
       expect(results.size).to eq(2)
       expect(results[0]['error']).to eq('Batch error')
@@ -220,7 +220,7 @@ RSpec.describe PlacekeyRails::Client do
     it "parses a successful response" do
       allow(described_class).to receive(:get_with_limiter).and_return(success_response)
       result = described_class.list_free_datasets
-      expect(result).to eq(['dataset1', 'dataset2'])
+      expect(result).to eq([ 'dataset1', 'dataset2' ])
     end
 
     it "handles API errors" do
@@ -260,14 +260,14 @@ RSpec.describe PlacekeyRails::Client do
         hash_including(query: { public_datasets: 'dataset1,dataset2', url: false })
       ).and_return(success_response)
 
-      result = described_class.return_free_dataset_joins_by_name(['dataset1', 'dataset2'])
+      result = described_class.return_free_dataset_joins_by_name([ 'dataset1', 'dataset2' ])
       expect(result).to eq({ "join_url" => "https://example.com/join" })
     end
 
     it "handles error responses" do
       allow(described_class).to receive(:get_with_limiter).and_return(error_response)
       # Update client to use response.body instead of response.reason
-      expect { described_class.return_free_dataset_joins_by_name(['invalid']) }.to raise_error(ArgumentError)
+      expect { described_class.return_free_dataset_joins_by_name([ 'invalid' ]) }.to raise_error(ArgumentError)
     end
   end
 end

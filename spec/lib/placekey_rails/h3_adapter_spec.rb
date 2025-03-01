@@ -6,13 +6,13 @@ RSpec.describe PlacekeyRails::H3Adapter do
   before do
     # Stub methods using H3's actual method names from the H3 Ruby gem
     allow(h3).to receive(:from_geo_coordinates).and_return(123456789)
-    allow(h3).to receive(:to_geo_coordinates).and_return([37.7371, -122.44283])
+    allow(h3).to receive(:to_geo_coordinates).and_return([ 37.7371, -122.44283 ])
     allow(h3).to receive(:from_string).and_return(123456789)
     allow(h3).to receive(:to_string).and_return("8a2830828767fff")
     allow(h3).to receive(:valid?).and_return(true)
-    allow(h3).to receive(:k_ring).and_return([123456789, 123456790, 123456791])
-    allow(h3).to receive(:to_boundary).and_return([[37.7371, -122.44283], [37.7373, -122.44284]])
-    allow(h3).to receive(:polyfill).and_return([123456789, 123456790])
+    allow(h3).to receive(:k_ring).and_return([ 123456789, 123456790, 123456791 ])
+    allow(h3).to receive(:to_boundary).and_return([ [ 37.7371, -122.44283 ], [ 37.7373, -122.44284 ] ])
+    allow(h3).to receive(:polyfill).and_return([ 123456789, 123456790 ])
   end
 
   describe '.lat_lng_to_cell' do
@@ -22,14 +22,14 @@ RSpec.describe PlacekeyRails::H3Adapter do
 
       result = described_class.lat_lng_to_cell(lat, lng, resolution)
       expect(result).to eq(123456789)
-      expect(h3).to have_received(:from_geo_coordinates).with([lat, lng], resolution)
+      expect(h3).to have_received(:from_geo_coordinates).with([ lat, lng ], resolution)
     end
   end
 
   describe '.cell_to_lat_lng' do
     it 'converts H3 cell to coordinates' do
       result = described_class.cell_to_lat_lng(123456789)
-      expect(result).to eq([37.7371, -122.44283])
+      expect(result).to eq([ 37.7371, -122.44283 ])
       expect(h3).to have_received(:to_geo_coordinates).with(123456789)
     end
   end
@@ -61,7 +61,7 @@ RSpec.describe PlacekeyRails::H3Adapter do
   describe '.grid_disk' do
     it 'gets hexagon neighbors' do
       result = described_class.grid_disk(123456789, 1)
-      expect(result).to eq([123456789, 123456790, 123456791])
+      expect(result).to eq([ 123456789, 123456790, 123456791 ])
       expect(h3).to have_received(:k_ring).with(123456789, 1)
     end
   end
@@ -69,19 +69,19 @@ RSpec.describe PlacekeyRails::H3Adapter do
   describe '.cell_to_boundary' do
     it 'gets cell boundary coordinates' do
       result = described_class.cell_to_boundary(123456789)
-      expect(result).to eq([[37.7371, -122.44283], [37.7373, -122.44284]])
+      expect(result).to eq([ [ 37.7371, -122.44283 ], [ 37.7373, -122.44284 ] ])
       expect(h3).to have_received(:to_boundary).with(123456789)
     end
   end
 
   describe '.polyfill' do
-    let(:coordinates) { [[37.7371, -122.44283], [37.7373, -122.44284], [37.7372, -122.44282]] }
+    let(:coordinates) { [ [ 37.7371, -122.44283 ], [ 37.7373, -122.44284 ], [ 37.7372, -122.44282 ] ] }
     let(:resolution) { 10 }
 
     it 'fills polygon with H3 cells' do
       # Our adapter ignores the holes parameter but accepts it for compatibility
       result = described_class.polyfill(coordinates, nil, resolution)
-      expect(result).to eq([123456789, 123456790])
+      expect(result).to eq([ 123456789, 123456790 ])
       # The H3 gem's polyfill only takes coordinates and resolution
       expect(h3).to have_received(:polyfill).with(coordinates, resolution)
     end
