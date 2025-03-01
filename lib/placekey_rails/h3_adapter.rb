@@ -1,14 +1,12 @@
 require 'h3'
 
 module PlacekeyRails
-  # This adapter module provides a bridge between the H3 gem's method naming
-  # and the method names used in the Placekey specification.
-  # This is needed because the H3 gem uses Ruby conventions (snake_case),
-  # while the Placekey Python library uses camelCase.
+  # This adapter module provides a bridge between the actual H3 gem methods
+  # and the methods expected by our Placekey implementation.
   module H3Adapter
     extend self
 
-    # Core indexing functions with snake_case names (Ruby style)
+    # Core methods using the actual H3 gem method names
     def lat_lng_to_cell(lat, lng, resolution)
       H3.from_geo_coordinates([lat, lng], resolution)
     end
@@ -37,19 +35,18 @@ module PlacekeyRails
       H3.to_boundary(h3_index)
     end
 
-    def polyfill(coordinates, holes, resolution)
-      # H3 gem's polyfill doesn't use holes parameter
+    def polyfill(coordinates, resolution, holes=nil)
+      # Note: H3 gem's polyfill doesn't use holes parameter
       H3.polyfill(coordinates, resolution)
     end
 
-    # Aliases for camelCase style (Python/JavaScript style)
-    # Used primarily for testing compatibility
-    alias :latLngToCell :lat_lng_to_cell
-    alias :cellToLatLng :cell_to_lat_lng
-    alias :stringToH3 :string_to_h3
-    alias :h3ToString :h3_to_string
-    alias :isValidCell :is_valid_cell
-    alias :gridDisk :grid_disk
-    alias :cellToBoundary :cell_to_boundary
+    # CamelCase aliases for compatibility with tests and some code
+    alias latLngToCell lat_lng_to_cell
+    alias cellToLatLng cell_to_lat_lng
+    alias stringToH3 string_to_h3
+    alias h3ToString h3_to_string
+    alias isValidCell is_valid_cell
+    alias gridDisk grid_disk
+    alias cellToBoundary cell_to_boundary
   end
 end

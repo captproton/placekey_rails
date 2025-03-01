@@ -1,15 +1,20 @@
 require 'rails_helper'
 
 RSpec.describe PlacekeyRails::Validator do
-  let(:h3_adapter) { class_double(PlacekeyRails::H3Adapter).as_stubbed_const }
-  let(:converter) { class_double(PlacekeyRails::Converter).as_stubbed_const }
+  # First, create a module double to mock the real modules
+  let(:h3_adapter_mock) { Module.new }
+  let(:converter_mock) { Module.new }
 
   before do
-    allow(h3_adapter).to receive(:lat_lng_to_cell) { 123456789 }
-    allow(h3_adapter).to receive(:string_to_h3) { 123456789 }
-    allow(h3_adapter).to receive(:h3_to_string) { "8a2830828767fff" }
-    allow(h3_adapter).to receive(:is_valid_cell) { true }
-    allow(converter).to receive(:placekey_to_h3_int) { 123456789 }
+    # Mock the H3Adapter
+    stub_const("PlacekeyRails::H3Adapter", h3_adapter_mock)
+    allow(h3_adapter_mock).to receive(:is_valid_cell).and_return(true)
+    allow(h3_adapter_mock).to receive(:string_to_h3).and_return(123456789)
+    
+    # Mock the Converter
+    stub_const("PlacekeyRails::Converter", converter_mock)
+    allow(converter_mock).to receive(:placekey_to_h3).and_return("8a2830828767fff")
+    allow(converter_mock).to receive(:placekey_to_h3_int).and_return(123456789)
   end
 
   describe ".placekey_format_is_valid" do
@@ -43,20 +48,20 @@ RSpec.describe PlacekeyRails::Validator do
     end
 
     it "rejects invalid where part format when H3 validation fails" do
-      allow(h3_adapter).to receive(:is_valid_cell) { false }  # Use snake_case
+      allow(h3_adapter_mock).to receive(:is_valid_cell).and_return(false)
       result = described_class.where_part_is_valid("5vg-7gq-tvz")
       expect(result).to be false
     end
 
     it "handles exceptions during conversion" do
-      allow(h3_adapter).to receive(:string_to_h3).and_raise(StandardError)
+      allow(converter_mock).to receive(:placekey_to_h3).and_raise(StandardError)
       result = described_class.where_part_is_valid("5vg-7gq-tvz")
       expect(result).to be false
     end
 
     context "when conversion fails" do
       before do
-        allow(converter).to receive(:placekey_to_h3_int).and_raise(StandardError)
+        allow(converter_mock).to receive(:placekey_to_h3).and_raise(StandardError)
       end
 
       it "returns false" do
@@ -65,14 +70,8 @@ RSpec.describe PlacekeyRails::Validator do
       end
     end
 
-    it "handles exceptions during conversion" do
-      allow(PlacekeyRails::Converter).to receive(:placekey_to_h3_int).and_raise(StandardError)
-      result = described_class.where_part_is_valid("5vg-7gq-tvz")
-      expect(result).to be false
-    end
-
     it "handles H3 validation exceptions" do
-      allow(h3_adapter).to receive(:is_valid_cell).and_raise(StandardError)
+      allow(h3_adapter_mock).to receive(:is_valid_cell).and_raise(StandardError)
       result = described_class.where_part_is_valid("5vg-7gq-tvz")
       expect(result).to be false
     end

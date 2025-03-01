@@ -2,13 +2,34 @@ require 'rails_helper'
 
 RSpec.describe PlacekeyRails do
   before do
-    # Mock the H3Adapter module for testing
-    stub_const("PlacekeyRails::H3Adapter", Module.new)
-    allow(PlacekeyRails::H3Adapter).to receive(:latLngToCell).and_return(123456789)
-    allow(PlacekeyRails::H3Adapter).to receive(:cellToLatLng).and_return([37.7371, -122.44283])
-    allow(PlacekeyRails::H3Adapter).to receive(:stringToH3).and_return(123456789)
-    allow(PlacekeyRails::H3Adapter).to receive(:h3ToString).and_return("8a2830828767fff")
-    allow(PlacekeyRails::H3Adapter).to receive(:isValidCell).and_return(true)
+    # Create a mock H3Adapter module
+    adapter_mock = Module.new
+    
+    # Define mock methods with the correct method names
+    adapter_mock.define_singleton_method(:lat_lng_to_cell) { |lat, lng, res| 123456789 }
+    adapter_mock.define_singleton_method(:cell_to_lat_lng) { |h3| [37.7371, -122.44283] }
+    adapter_mock.define_singleton_method(:string_to_h3) { |str| 123456789 }
+    adapter_mock.define_singleton_method(:h3_to_string) { |h3| "8a2830828767fff" }
+    adapter_mock.define_singleton_method(:is_valid_cell) { |h3| true }
+    
+    # Create aliases for camelCase methods
+    adapter_mock.define_singleton_method(:latLngToCell) { |lat, lng, res| lat_lng_to_cell(lat, lng, res) }
+    adapter_mock.define_singleton_method(:cellToLatLng) { |h3| cell_to_lat_lng(h3) }
+    adapter_mock.define_singleton_method(:stringToH3) { |str| string_to_h3(str) }
+    adapter_mock.define_singleton_method(:h3ToString) { |h3| h3_to_string(h3) }
+    adapter_mock.define_singleton_method(:isValidCell) { |h3| is_valid_cell(h3) }
+    
+    # Stub the H3Adapter constant
+    stub_const("PlacekeyRails::H3Adapter", adapter_mock)
+    
+    # Set up converter and other mocks
+    allow(PlacekeyRails::Converter).to receive(:geo_to_placekey).and_return("@5vg-82n-kzz")
+    allow(PlacekeyRails::Converter).to receive(:placekey_to_geo).and_return([37.7371, -122.44283])
+    allow(PlacekeyRails::Converter).to receive(:h3_to_placekey).and_return("@5vg-82n-kzz")
+    allow(PlacekeyRails::Converter).to receive(:placekey_to_h3).and_return("8a2830828767fff")
+    allow(PlacekeyRails::Validator).to receive(:placekey_format_is_valid).and_return(true)
+    allow(PlacekeyRails::Spatial).to receive(:get_neighboring_placekeys).and_return(Set.new(["@5vg-82n-kzz"]))
+    allow(PlacekeyRails::Spatial).to receive(:placekey_distance).and_return(1242.8)
   end
   
   it "has constants defined for Placekey encoding" do
@@ -28,16 +49,6 @@ RSpec.describe PlacekeyRails do
   end
   
   describe "convenience methods" do
-    before do
-      allow(PlacekeyRails::Converter).to receive(:geo_to_placekey).and_return("@5vg-82n-kzz")
-      allow(PlacekeyRails::Converter).to receive(:placekey_to_geo).and_return([37.7371, -122.44283])
-      allow(PlacekeyRails::Converter).to receive(:h3_to_placekey).and_return("@5vg-82n-kzz")
-      allow(PlacekeyRails::Converter).to receive(:placekey_to_h3).and_return("8a2830828767fff")
-      allow(PlacekeyRails::Validator).to receive(:placekey_format_is_valid).and_return(true)
-      allow(PlacekeyRails::Spatial).to receive(:get_neighboring_placekeys).and_return(Set.new(["@5vg-82n-kzz"]))
-      allow(PlacekeyRails::Spatial).to receive(:placekey_distance).and_return(1242.8)
-    end
-    
     it "provides geo_to_placekey method" do
       expect(PlacekeyRails.geo_to_placekey(37.7371, -122.44283)).to eq("@5vg-82n-kzz")
     end

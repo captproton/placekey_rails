@@ -42,8 +42,9 @@ module PlacekeyRails
         
         # Then check if it converts to a valid H3 index
         placekey = "@#{where}"  # Add @ to make it a valid placekey for converter
-        h3_index = Converter.placekey_to_h3(placekey)
-        H3Adapter.is_valid_cell(H3Adapter.string_to_h3(h3_index))
+        h3_string = Converter.placekey_to_h3(placekey)
+        h3_index = H3Adapter.string_to_h3(h3_string)
+        H3Adapter.is_valid_cell(h3_index)
       rescue StandardError => e
         false
       end
