@@ -1,6 +1,6 @@
 # PlacekeyRails
 
-A Ruby on Rails engine that provides functionality for working with Placekeys - a universal standard identifier for physical places.
+A Ruby on Rails engine that provides functionality for working with Placekeys - a universal standard identifier for physical places. yup.
 
 ## Installation
 
