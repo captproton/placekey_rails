@@ -1,5 +1,14 @@
 require 'rails_helper'
 
+# Mock Rover::DataFrame for testing if not already defined
+unless defined?(Rover)
+  module Rover
+    class DataFrame
+      # This is just a mock class for testing
+    end
+  end
+end
+
 RSpec.describe PlacekeyRails, "Module API Client Methods" do
   let(:api_key) { "test_api_key" }
   let(:mock_client) { instance_double(PlacekeyRails::Client) }
@@ -68,7 +77,7 @@ RSpec.describe PlacekeyRails, "Module API Client Methods" do
   end
   
   describe ".placekey_dataframe" do
-    let(:dataframe) { instance_double("Rover::DataFrame") }
+    let(:dataframe) { instance_double(Rover::DataFrame) }
     let(:column_mapping) { { 'latitude' => 'lat', 'longitude' => 'lng' } }
     
     it "delegates to the default client with default parameters" do

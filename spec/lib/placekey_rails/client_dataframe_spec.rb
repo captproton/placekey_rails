@@ -1,5 +1,12 @@
 require 'rails_helper'
 
+# Mock Rover::DataFrame for testing
+module Rover
+  class DataFrame
+    # This is just a mock class for testing
+  end
+end
+
 RSpec.describe PlacekeyRails::Client, "DataFrame Integration" do
   let(:api_key) { "test_api_key" }
   let(:client) { described_class.new(api_key) }
@@ -7,7 +14,7 @@ RSpec.describe PlacekeyRails::Client, "DataFrame Integration" do
   
   # Mock Rover::DataFrame for testing
   let(:dataframe) do
-    df = instance_double("Rover::DataFrame")
+    df = instance_double(Rover::DataFrame)
     allow(df).to receive(:[]).and_return(df)
     allow(df).to receive(:[]=)
     allow(df).to receive(:has_column?).and_return(true)
