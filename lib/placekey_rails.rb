@@ -12,36 +12,38 @@ require "placekey_rails/validator"
 require "placekey_rails/spatial"
 
 module PlacekeyRails
+  class Error < StandardError; end
+
   class << self
     # Convenience methods at module level
     def geo_to_placekey(lat, long)
       Converter.geo_to_placekey(lat, long)
     end
-    
+
     def placekey_to_geo(placekey)
       Converter.placekey_to_geo(placekey)
     end
-    
+
     def placekey_to_h3(placekey)
       Converter.placekey_to_h3(placekey)
     end
-    
+
     def h3_to_placekey(h3_string)
       Converter.h3_to_placekey(h3_string)
     end
-    
+
     def placekey_format_is_valid(placekey)
       Validator.placekey_format_is_valid(placekey)
     end
-    
+
     def get_neighboring_placekeys(placekey, dist=1)
       Spatial.get_neighboring_placekeys(placekey, dist)
     end
-    
+
     def placekey_distance(placekey_1, placekey_2)
       Spatial.placekey_distance(placekey_1, placekey_2)
     end
-    
+
     def get_prefix_distance_dict
       {
         0 => 2.004e7,
@@ -56,32 +58,32 @@ module PlacekeyRails
         9 => 63.47
       }
     end
-    
+
     # Additional convenience methods for spatial operations
     def placekey_to_hex_boundary(placekey, geo_json=false)
       Spatial.placekey_to_hex_boundary(placekey, geo_json)
     end
-    
+
     def placekey_to_polygon(placekey, geo_json=false)
       Spatial.placekey_to_polygon(placekey, geo_json)
     end
-    
+
     def placekey_to_wkt(placekey, geo_json=false)
       Spatial.placekey_to_wkt(placekey, geo_json)
     end
-    
+
     def placekey_to_geojson(placekey)
       Spatial.placekey_to_geojson(placekey)
     end
-    
+
     def polygon_to_placekeys(poly, include_touching=false, geo_json=false)
       Spatial.polygon_to_placekeys(poly, include_touching, geo_json)
     end
-    
+
     def wkt_to_placekeys(wkt, include_touching=false, geo_json=false)
       Spatial.wkt_to_placekeys(wkt, include_touching, geo_json)
     end
-    
+
     def geojson_to_placekeys(geojson, include_touching=false, geo_json=true)
       Spatial.geojson_to_placekeys(geojson, include_touching, geo_json)
     end

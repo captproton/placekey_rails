@@ -6,8 +6,8 @@ PATH
       httparty (~> 0.22.0)
       jsbundling-rails
       rails (>= 8.0.1)
-      rgeo (~> 3.0, >= 3.0.1)
-      rgeo-geojson (~> 2.2.0)
+      rgeo (~> 3.0)
+      rgeo-geojson (~> 2.2)
       rover-df (~> 0.4.1)
       stimulus-rails
       tailwindcss-rails
