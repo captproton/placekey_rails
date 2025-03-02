@@ -24,7 +24,7 @@ jobs:
       - name: Lint code for consistent style
         run: bin/rubocop -f github
 
-  test:
+  ruby-test:
     runs-on: ubuntu-latest
     strategy:
       matrix:
@@ -53,5 +53,27 @@ jobs:
           cd spec/dummy
           bin/rails db:create db:schema:load RAILS_ENV=test
       
-      - name: Run tests
+      - name: Run Ruby tests
         run: bundle exec rspec
+        
+  js-test:
+    runs-on: ubuntu-latest
+    
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+        
+      - name: Set up Node.js
+        uses: actions/setup-node@v3
+        with:
+          node-version: '18'
+          
+      - name: Install JavaScript dependencies
+        run: |
+          cd spec/dummy
+          npm install
+          
+      - name: Run JavaScript tests
+        run: |
+          cd spec/dummy
+          npm test
