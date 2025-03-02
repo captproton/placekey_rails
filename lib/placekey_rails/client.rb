@@ -38,6 +38,7 @@ module PlacekeyRails
       @max_retries = options[:max_retries] || 20
       @logger = options[:logger] || Rails.logger
       @user_agent_comment = options[:user_agent_comment]
+      @use_cache = options[:use_cache].nil? ? true : options[:use_cache]
 
       @headers = {
         "Content-Type" => "application/json",
@@ -63,6 +64,14 @@ module PlacekeyRails
     def lookup_placekey(params = {}, fields = nil)
       validate_query!(params)
 
+      # Use cache if enabled and available
+      cache_key = nil
+      if @use_cache && PlacekeyRails.cache
+        cache_key = "lookup:#{params.to_json}:#{fields.to_json}"
+        cached_result = PlacekeyRails.cache.get(cache_key)
+        return cached_result if cached_result
+      end
+
       payload = { query: params }
       payload[:options] = { fields: fields } if fields
 
@@ -73,7 +82,14 @@ module PlacekeyRails
         )
       end
 
-      handle_response(response)
+      result = handle_response(response)
+      
+      # Cache the result if caching is enabled
+      if cache_key && PlacekeyRails.cache
+        PlacekeyRails.cache.set(cache_key, result)
+      end
+      
+      result
     end
 
     def lookup_placekeys(places, fields = nil, batch_size = MAX_BATCH_SIZE, verbose = false)
@@ -93,7 +109,33 @@ module PlacekeyRails
       end
 
       results = []
-
+      
+      # Check cache for already processed places
+      if @use_cache && PlacekeyRails.cache
+        cached_places = []
+        uncached_places = []
+        
+        places.each do |place|
+          cache_key = "lookup:#{place.to_json}:#{fields.to_json}"
+          cached_result = PlacekeyRails.cache.get(cache_key)
+          
+          if cached_result
+            results << cached_result
+            cached_places << place
+          else
+            uncached_places << place
+          end
+        end
+        
+        if cached_places.any? && verbose
+          logger.info("Found #{cached_places.size} places in cache")
+        end
+        
+        # Continue with only uncached places
+        places = uncached_places
+      end
+      
+      # Process any remaining uncached places
       (0...places.size).step(batch_size) do |i|
         max_batch_idx = [ i + batch_size, places.size ].min
         batch_query_ids = places[i...max_batch_idx].map { |p| p["query_id"] }
@@ -109,6 +151,19 @@ module PlacekeyRails
             logger.error(batch_results["message"])
             logger.error("Returning completed queries")
             break
+          end
+          
+          # Cache individual results if caching is enabled
+          if @use_cache && PlacekeyRails.cache && batch_results.is_a?(Array)
+            batch_results.each_with_index do |result, j|
+              if result && !result.key?("error")
+                place_index = i + j
+                if place_index < places.size
+                  cache_key = "lookup:#{places[place_index].to_json}:#{fields.to_json}"
+                  PlacekeyRails.cache.set(cache_key, result)
+                end
+              end
+            end
           end
 
           results.concat(Array(batch_results))

@@ -11,12 +11,14 @@ require "placekey_rails/converter"
 require "placekey_rails/validator"
 require "placekey_rails/spatial"
 require "placekey_rails/client"
+require "placekey_rails/cache"
 
 module PlacekeyRails
   class Error < StandardError; end
 
   # Default API client used for convenience methods
   @default_client = nil
+  @cache = nil
 
   class << self
     # Accessor for the default client
@@ -27,6 +29,25 @@ module PlacekeyRails
     # @param options [Hash] Additional options for the client
     def setup_client(api_key, options = {})
       @default_client = Client.new(api_key, options)
+    end
+    
+    # Enable caching to improve performance
+    # @param max_size [Integer] Maximum number of items to cache
+    # @return [Cache] The cache instance
+    def enable_caching(max_size: 1000)
+      @cache = Cache.new(max_size)
+    end
+    
+    # Get the current cache instance
+    # @return [Cache, nil] The cache instance or nil if caching is not enabled
+    def cache
+      @cache
+    end
+    
+    # Clear the cache
+    # @return [void]
+    def clear_cache
+      @cache&.clear
     end
 
     # Convenience methods at module level
