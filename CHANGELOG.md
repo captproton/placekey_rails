@@ -8,6 +8,23 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 ## [Unreleased]
 
 ### Added
+- ActiveRecord integration through `Placekeyable` concern
+  - Automatic Placekey generation from coordinates
+  - Placekey validations and format checking
+  - Spatial query methods for finding locations by distance
+  - Address geocoding utilities
+- View helpers for displaying and working with Placekeys
+  - `PlacekeyHelper` for formatting and map integration
+  - `FormHelper` for Placekey form fields
+- JavaScript components with Stimulus.js controllers
+  - Map visualization with Leaflet.js
+  - Auto-generation of Placekeys from coordinates
+  - Address lookup functionality
+  - Placekey preview functionality
+- API endpoints for JavaScript integration
+  - Placekey info endpoint
+  - Coordinate to Placekey conversion
+  - Address to Placekey lookup
 - Comprehensive documentation with API reference
 - Detailed examples and usage guides
 - Troubleshooting documentation

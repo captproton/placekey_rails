@@ -26,6 +26,9 @@ Example: `227@5vg-82n-kzz` where `227` is the "what" and `@5vg-82n-kzz` is the "
 - Find Placekeys within geographic areas
 - Interface with the Placekey API for lookups
 - Process dataframes with Placekey data
+- ActiveRecord integration with model concerns
+- View helpers for displaying and working with Placekeys
+- JavaScript components for interactive Placekey maps and forms
 
 ## Installation
 
@@ -167,12 +170,77 @@ places = [
 results = PlacekeyRails.lookup_placekeys(places)
 ```
 
+## ActiveRecord Integration
+
+Add Placekey functionality to your models:
+
+```ruby
+# app/models/location.rb
+class Location < ApplicationRecord
+  include PlacekeyRails::Concerns::Placekeyable
+  
+  # Now your model has:
+  # - Automatic Placekey generation from coordinates
+  # - Placekey validation
+  # - Spatial query methods
+end
+
+# Find locations within 500 meters of a Placekey
+nearby = Location.within_distance("@5vg-82n-kzz", 500)
+
+# Find locations within a geographic area
+within_area = Location.within_geojson(geojson_data)
+
+# Batch geocode locations
+Location.batch_geocode_addresses
+```
+
+## View Helpers
+
+Use the included helpers to display Placekeys in your views:
+
+```erb
+<%# Format a Placekey for display %>
+<%= format_placekey("abc-123@5vg-82n-kzz") %>
+
+<%# Display a Placekey on a map %>
+<%= leaflet_map_for_placekey(@location.placekey) %>
+
+<%# Generate a Placekey card with map %>
+<%= placekey_card(@location.placekey, title: "Store Location") %>
+
+<%# Create an address form with Placekey lookup %>
+<%= form_with(model: @location) do |form| %>
+  <%= placekey_address_fields(form) %>
+  <%= form.submit %>
+<% end %>
+```
+
+## JavaScript Components
+
+The gem includes Stimulus.js controllers for interactive Placekey functionality:
+
+- `placekey-map` - Displays a Placekey on a Leaflet map
+- `placekey-generator` - Automatically generates a Placekey from coordinates
+- `placekey-lookup` - Looks up a Placekey from an address
+- `placekey-preview` - Shows a preview map for a Placekey
+
+Simply include the JavaScript in your application:
+
+```javascript
+// app/javascript/application.js
+import "placekey_rails"
+```
+
 ## Documentation
 
 For detailed documentation, please see:
 
 - [API Reference](docs/API_REFERENCE.md) - Complete reference for all gem methods
 - [Examples](docs/EXAMPLES.md) - Detailed examples of using the gem
+- [ActiveRecord Integration](docs/ACTIVERECORD_INTEGRATION.md) - Using with models
+- [View Helpers](docs/VIEW_HELPERS.md) - Helpers for views and forms
+- [JavaScript Components](docs/JAVASCRIPT_COMPONENTS.md) - Using the JS components
 - [Troubleshooting](docs/TROUBLESHOOTING.md) - Solutions for common issues
 
 ## Development
