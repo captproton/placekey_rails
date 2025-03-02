@@ -8,16 +8,36 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 ## [Unreleased]
 
 ### Added
+- Comprehensive documentation with API reference
+- Detailed examples and usage guides
+- Troubleshooting documentation
+- YARD configuration for API docs generation
+- Performance optimizations for H3 operations
+- Improved error handling throughout the library
+
+## [0.1.0] - 2025-02-28
+
+### Added
 - Initial release
 - Rails engine setup
 - Basic Placekey conversion functionality
-- Integration with H3 for geospatial operations
-- RGeo integration for spatial operations
-- GeoJSON support
-- API functionality using HTTParty
-- DataFrame operations support using rover-df
-- Tailwind CSS integration
-- Turbo and Stimulus support
+  - Converter for geographic coordinates to Placekeys
+  - Converter for H3 indices to Placekeys
+  - Parser for Placekey components
+- H3Adapter for bridging between H3 gem and Placekey logic
+- Validator for checking Placekey format validity
+- Spatial operations
+  - Neighboring Placekeys calculation
+  - Distance calculation between Placekeys
+  - Hexagon boundary and polygon conversions
+  - GeoJSON, WKT, and polygon utilities
+- API Client
+  - Robust rate limiting mechanism
+  - Batch processing support
+  - DataFrame integration
+  - Comprehensive error handling
+- Full test suite with RSpec
+- CI/CD setup with GitHub Actions
 
 ### Dependencies
 - Rails >= 8.0.1
@@ -32,3 +52,4 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - Tailwind CSS Rails
 
 [Unreleased]: https://github.com/captproton/placekey_rails/compare/v0.1.0...HEAD
+[0.1.0]: https://github.com/captproton/placekey_rails/releases/tag/v0.1.0
