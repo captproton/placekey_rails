@@ -29,6 +29,7 @@ Example: `227@5vg-82n-kzz` where `227` is the "what" and `@5vg-82n-kzz` is the "
 - ActiveRecord integration with model concerns
 - View helpers for displaying and working with Placekeys
 - JavaScript components for interactive Placekey maps and forms
+- Built-in caching and batch processing for performance optimization
 
 ## Installation
 
@@ -232,6 +233,34 @@ Simply include the JavaScript in your application:
 import "placekey_rails"
 ```
 
+## Performance Optimization
+
+PlacekeyRails includes various performance optimization features:
+
+### Built-in Caching
+
+```ruby
+# Enable caching to reduce API calls
+PlacekeyRails.enable_caching(max_size: 1000)
+
+# Clear the cache when needed
+PlacekeyRails.clear_cache
+```
+
+### Batch Processing
+
+```ruby
+# Process multiple records efficiently
+result = PlacekeyRails.batch_geocode(Location.where(placekey: nil), batch_size: 100)
+
+# With progress reporting
+PlacekeyRails.batch_geocode(Location.where(placekey: nil)) do |processed, successful|
+  puts "Processed #{processed} locations (#{successful} successful)"
+end
+```
+
+For more performance tips, see the [Performance Optimization Guide](docs/PERFORMANCE.md).
+
 ## Documentation
 
 For detailed documentation, please see:
@@ -241,6 +270,7 @@ For detailed documentation, please see:
 - [ActiveRecord Integration](docs/ACTIVERECORD_INTEGRATION.md) - Using with models
 - [View Helpers](docs/VIEW_HELPERS.md) - Helpers for views and forms
 - [JavaScript Components](docs/JAVASCRIPT_COMPONENTS.md) - Using the JS components
+- [Performance Optimization](docs/PERFORMANCE.md) - Tips for optimizing performance
 - [Troubleshooting](docs/TROUBLESHOOTING.md) - Solutions for common issues
 
 ## Development
