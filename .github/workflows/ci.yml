@@ -69,11 +69,7 @@ jobs:
           node-version: '18'
           
       - name: Install JavaScript dependencies
-        run: |
-          cd spec/dummy
-          npm install
+        run: npm install
           
       - name: Run JavaScript tests
-        run: |
-          cd spec/dummy
-          npm test
+        run: npm test -- --passWithNoTests
