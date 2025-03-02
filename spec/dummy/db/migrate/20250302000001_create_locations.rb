@@ -10,10 +10,10 @@ class CreateLocations < ActiveRecord::Migration[8.0]
       t.string :region
       t.string :postal_code
       t.string :country
-      
+
       t.timestamps
     end
-    
+
     add_index :locations, :placekey
   end
 end
