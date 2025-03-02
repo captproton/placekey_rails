@@ -7,6 +7,8 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+## [0.2.0] - 2025-03-02
+
 ### Added
 - ActiveRecord integration through `Placekeyable` concern
   - Automatic Placekey generation from coordinates
@@ -25,12 +27,21 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
   - Placekey info endpoint
   - Coordinate to Placekey conversion
   - Address to Placekey lookup
-- Comprehensive documentation with API reference
-- Detailed examples and usage guides
-- Troubleshooting documentation
-- YARD configuration for API docs generation
-- Performance optimizations for H3 operations
-- Improved error handling throughout the library
+- Performance optimization features
+  - Built-in caching system with LRU eviction
+  - Batch processing for large datasets
+  - Optimized spatial queries
+  - Memory usage improvements
+- Comprehensive documentation
+  - Performance optimization guide
+  - API reference documentation
+  - Detailed examples and usage guides
+  - Troubleshooting documentation
+
+### Changed
+- Enhanced error handling throughout the library
+- Improved module configuration options
+- More flexible API client options
 
 ## [0.1.0] - 2025-02-28
 
@@ -68,5 +79,6 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - Turbo Rails
 - Tailwind CSS Rails
 
-[Unreleased]: https://github.com/captproton/placekey_rails/compare/v0.1.0...HEAD
+[Unreleased]: https://github.com/captproton/placekey_rails/compare/v0.2.0...HEAD
+[0.2.0]: https://github.com/captproton/placekey_rails/compare/v0.1.0...v0.2.0
 [0.1.0]: https://github.com/captproton/placekey_rails/releases/tag/v0.1.0
