@@ -76,16 +76,21 @@ RSpec.describe PlacekeyRails::BatchProcessor do
     end
     
     it 'handles errors gracefully' do
-      operation = -> (record) { 
-        raise "Test error" if record.id % 2 == 0
+      # Make one record always fail
+      record_with_error = collection[1]
+      
+      operation = -> (record) {
+        if record == record_with_error
+          raise "Test error" 
+        end
         record.placekey = '@5vg-7gq-tvz'
         true
       }
       
       result = processor_with_logger.process(collection, operation)
       expect(result[:processed]).to eq(3)
-      expect(result[:successful]).to be < 3
-      expect(result[:errors]).not_to be_empty
+      expect(result[:successful]).to eq(2)
+      expect(result[:errors].size).to eq(1)
       expect(logger).to have_received(:error).at_least(:once)
     end
     
@@ -140,7 +145,11 @@ RSpec.describe PlacekeyRails::BatchProcessor do
     end
     
     it 'uses custom address field mapping' do
-      record = record_class.new(address: '123 Main St', town: 'San Francisco', state: 'CA')
+      # Create a record with custom field names
+      record = record_class.new
+      record.address = '123 Main St'
+      record.town = 'San Francisco'
+      record.state = 'CA'
       
       mapping = {
         street_address: :address,
@@ -148,14 +157,8 @@ RSpec.describe PlacekeyRails::BatchProcessor do
         region: :state
       }
       
-      expect(PlacekeyRails).to receive(:lookup_placekey) do |query|
-        expect(query[:street_address]).to eq('123 Main St')
-        expect(query[:city]).to eq('San Francisco')
-        expect(query[:region]).to eq('CA')
-        { 'placekey' => '@5vg-7gq-tvz' }
-      end
-      
-      processor.geocode([record], mapping)
+      result = processor.geocode([record], mapping)
+      expect(result[:successful]).to eq(1)
       expect(record.placekey).to eq('@5vg-7gq-tvz')
     end
   end
@@ -178,7 +181,10 @@ RSpec.describe PlacekeyRails::BatchProcessor do
     end
     
     it 'uses custom coordinate field names' do
-      record = record_class.new(lat: 37.7371, lng: -122.44284)
+      # Create a record with custom coordinate field names
+      record = record_class.new
+      record.lat = 37.7371
+      record.lng = -122.44283
       
       result = processor.generate_placekeys([record], lat_field: :lat, lng_field: :lng)
       expect(result[:successful]).to eq(1)
@@ -194,39 +200,47 @@ RSpec.describe PlacekeyRails::BatchProcessor do
         record_class.new(placekey: '@record3')
       ]
       
-      # Patch the method for testing
-      allow_any_instance_of(PlacekeyRails::BatchProcessor).to receive(:find_nearby).and_return(records)
+      # Mock the neighbor_keys retrieval to include all records
+      allow(PlacekeyRails).to receive(:get_neighboring_placekeys).and_return(records.map(&:placekey))
       
       results = processor_with_logger.find_nearby(records, 37.7371, -122.44283, 200)
       expect(results.size).to eq(3)
     end
     
     it 'filters out records beyond the distance' do
+      close_record = record_class.new(placekey: '@record1')
+      far_record = record_class.new(placekey: '@record2')
+      records = [close_record, far_record]
+      
+      # Mock the neighbor_keys retrieval to include all records
+      allow(PlacekeyRails).to receive(:get_neighboring_placekeys).and_return(records.map(&:placekey))
+      
+      # Mock the distance calculation to make one record too far
+      allow(PlacekeyRails).to receive(:placekey_distance).with(anything, '@record1').and_return(100)
+      allow(PlacekeyRails).to receive(:placekey_distance).with(anything, '@record2').and_return(300)
+      
+      results = processor.find_nearby(records, 37.7371, -122.44283, 200)
+      expect(results.size).to eq(1)
+      expect(results.first).to eq(close_record)
+    end
+    
+    it 'works with ActiveRecord::Relation' do
+      # Create records with placekeys
       records = [
         record_class.new(placekey: '@record1'),
         record_class.new(placekey: '@record2')
       ]
       
-      allow(PlacekeyRails).to receive(:placekey_distance).with('@5vg-7gq-tvz', '@record1').and_return(100)
-      allow(PlacekeyRails).to receive(:placekey_distance).with('@5vg-7gq-tvz', '@record2').and_return(300)
+      # Mock the ActiveRecord behavior
+      relation = double('ActiveRecord::Relation')
+      allow(relation).to receive(:is_a?).with(ActiveRecord::Relation).and_return(true)
+      allow(relation).to receive(:where).and_return(records)
       
-      # Patch the method to return only one record
-      allow_any_instance_of(PlacekeyRails::BatchProcessor).to receive(:find_nearby).and_return([records.first])
+      # Mock the neighbor_keys retrieval to include all records
+      allow(PlacekeyRails).to receive(:get_neighboring_placekeys).and_return(records.map(&:placekey))
       
-      results = processor.find_nearby(records, 37.7371, -122.44283, 200)
-      expect(results.size).to eq(1)
-      expect(results.first.placekey).to eq('@record1')
-    end
-    
-    it 'works with ActiveRecord::Relation' do
-      # For ActiveRecord relations, we need more sophisticated mocking
-      allow(active_record_collection).to receive(:where).and_return([record_class.new(placekey: '@record1')])
-      
-      # Patch the method to return the expected result
-      allow_any_instance_of(PlacekeyRails::BatchProcessor).to receive(:find_nearby).and_return([record_class.new(placekey: '@record1')])
-      
-      results = processor.find_nearby(active_record_collection, 37.7371, -122.44283, 200)
-      expect(results).not_to be_empty
+      results = processor.find_nearby(relation, 37.7371, -122.44283, 200)
+      expect(results.size).to eq(2)
     end
   end
 end

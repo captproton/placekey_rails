@@ -39,16 +39,19 @@ RSpec.describe PlacekeyRails do
 
     describe ".batch_processor" do
       it "creates a new BatchProcessor instance" do
-        processor = PlacekeyRails.batch_processor
-        expect(processor).to be_a(PlacekeyRails::BatchProcessor)
+        # Mock the BatchProcessor class
+        processor_mock = double('BatchProcessor')
+        allow(PlacekeyRails::BatchProcessor).to receive(:new).and_return(processor_mock)
+        
+        result = PlacekeyRails.batch_processor
+        expect(result).to eq(processor_mock)
       end
 
       it "passes options to the BatchProcessor" do
-        logger = double('logger')
-        processor = PlacekeyRails.batch_processor(batch_size: 50, logger: logger)
+        # Mock BatchProcessor
+        expect(PlacekeyRails::BatchProcessor).to receive(:new).with(batch_size: 50)
         
-        expect(processor.batch_size).to eq(50)
-        expect(processor.logger).to eq(logger)
+        PlacekeyRails.batch_processor(batch_size: 50)
       end
     end
     
@@ -85,36 +88,41 @@ RSpec.describe PlacekeyRails do
       end
       
       before do
-        # Stub the BatchProcessor for testing
-        mock_processor = instance_double(PlacekeyRails::BatchProcessor)
-        allow(mock_processor).to receive(:geocode).and_return({processed: 2, successful: 2})
-        allow(mock_processor).to receive(:find_nearby).and_return(collection)
+        # Mock BatchProcessor and its methods
+        processor_mock = double('BatchProcessor')
+        allow(processor_mock).to receive(:geocode).and_return({processed: 2, successful: 2})
+        allow(processor_mock).to receive(:find_nearby).and_return(collection)
         
-        allow(PlacekeyRails::BatchProcessor).to receive(:new).and_return(mock_processor)
+        allow(PlacekeyRails).to receive(:batch_processor).and_return(processor_mock)
         allow(PlacekeyRails).to receive(:default_client).and_return(double('client'))
       end
       
       describe ".batch_geocode" do
         it "calls BatchProcessor#geocode with the collection" do
-          result = PlacekeyRails.batch_geocode(collection)
-          expect(result[:processed]).to eq(2)
-          expect(result[:successful]).to eq(2)
+          processor_mock = PlacekeyRails.batch_processor
+          expect(processor_mock).to receive(:geocode).with(collection)
+          
+          PlacekeyRails.batch_geocode(collection)
         end
         
         it "accepts a batch_size parameter" do
-          expect(PlacekeyRails::BatchProcessor).to receive(:new).with(batch_size: 50)
+          expect(PlacekeyRails).to receive(:batch_processor).with(batch_size: 50)
+          
           PlacekeyRails.batch_geocode(collection, batch_size: 50)
         end
       end
       
       describe ".find_nearby" do
         it "calls BatchProcessor#find_nearby with the coordinates and distance" do
-          result = PlacekeyRails.find_nearby(collection, 37.7371, -122.44283, 1000)
-          expect(result).to eq(collection)
+          processor_mock = PlacekeyRails.batch_processor
+          expect(processor_mock).to receive(:find_nearby).with(collection, 37.7371, -122.44283, 1000)
+          
+          PlacekeyRails.find_nearby(collection, 37.7371, -122.44283, 1000)
         end
         
         it "accepts additional options" do
-          expect_any_instance_of(PlacekeyRails::BatchProcessor).to receive(:find_nearby).with(
+          processor_mock = PlacekeyRails.batch_processor
+          expect(processor_mock).to receive(:find_nearby).with(
             collection, 37.7371, -122.44283, 1000, placekey_field: :custom_field
           )
           

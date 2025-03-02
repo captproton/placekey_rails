@@ -12,6 +12,7 @@ require "placekey_rails/validator"
 require "placekey_rails/spatial"
 require "placekey_rails/client"
 require "placekey_rails/cache"
+require "placekey_rails/batch_processor"
 
 module PlacekeyRails
   class Error < StandardError; end
@@ -19,10 +20,19 @@ module PlacekeyRails
   # Default API client used for convenience methods
   @default_client = nil
   @cache = nil
+  @config = {
+    default_country_code: 'US',
+    validate_placekeys: true,
+    api_timeout: 10,
+    raise_on_api_error: false
+  }
 
   class << self
     # Accessor for the default client
     attr_reader :default_client
+    
+    # Access the configuration hash
+    attr_reader :config
 
     # Set up a default client for convenience methods
     # @param api_key [String] The Placekey API key
@@ -48,6 +58,21 @@ module PlacekeyRails
     # @return [void]
     def clear_cache
       @cache&.clear
+    end
+    
+    # Configure the PlacekeyRails module
+    # @yield [config] Block to configure the module
+    # @return [Hash] The configuration hash
+    def configure
+      yield @config if block_given?
+      @config
+    end
+    
+    # Create a new BatchProcessor for optimized operations
+    # @param options [Hash] Options for the BatchProcessor
+    # @return [BatchProcessor] The BatchProcessor instance
+    def batch_processor(options = {})
+      BatchProcessor.new(options)
     end
 
     # Convenience methods at module level
@@ -168,6 +193,28 @@ module PlacekeyRails
     def placekey_dataframe(dataframe, column_mapping, fields = nil, batch_size = 100, verbose = false)
       ensure_client_setup
       default_client.placekey_dataframe(dataframe, column_mapping, fields, batch_size, verbose)
+    end
+    
+    # Batch geocode records that have addresses but no placekeys
+    # @param collection [ActiveRecord::Relation, Array] Collection to geocode
+    # @param batch_size [Integer] Number of records to process in each batch
+    # @param options [Hash] Additional options for geocoding
+    # @return [Hash] Results of the geocoding operation
+    def batch_geocode(collection, batch_size: 100, options: {})
+      processor = batch_processor(batch_size: batch_size)
+      processor.geocode(collection, options)
+    end
+    
+    # Find records within a specified distance of coordinates
+    # @param collection [ActiveRecord::Relation, Array] Collection to search
+    # @param latitude [Float] Latitude of the center point
+    # @param longitude [Float] Longitude of the center point
+    # @param distance [Float] Maximum distance in meters
+    # @param options [Hash] Additional options for the search
+    # @return [Array] Records within the distance
+    def find_nearby(collection, latitude, longitude, distance, options: {})
+      processor = batch_processor
+      processor.find_nearby(collection, latitude, longitude, distance, **options)
     end
 
     private

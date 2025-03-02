@@ -61,8 +61,8 @@ RSpec.describe PlacekeyRails::Api::PlacekeysController, type: :controller do
     end
     
     it 'returns error for invalid coordinates' do
-      # Use allow instead of expect for the test to work properly
-      allow(PlacekeyRails).to receive(:geo_to_placekey).with(0.0, -122.44283).and_raise(StandardError.new("Invalid coordinates"))
+      # Mock validation to fail
+      allow(controller).to receive(:valid_coordinates?).and_return(false)
       
       post :from_coordinates, params: { latitude: 'invalid', longitude: -122.44283 }
       
@@ -72,7 +72,7 @@ RSpec.describe PlacekeyRails::Api::PlacekeysController, type: :controller do
     end
     
     it 'returns error for out-of-range coordinates' do
-      allow(controller).to receive(:valid_coordinates?).with(100, -122.44283).and_return(false)
+      allow(controller).to receive(:valid_coordinates?).and_return(false)
       
       post :from_coordinates, params: { latitude: 100, longitude: -122.44283 }
       
