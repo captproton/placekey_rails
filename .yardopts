@@ -1,0 +1,13 @@
+--markup markdown
+--markup-provider redcarpet
+--title "PlacekeyRails Documentation"
+--protected
+--no-private
+--embed-mixins
+--asset docs/images:images
+'lib/**/*.rb'
+-
+LICENSE
+README.md
+CHANGELOG.md
+docs/*.md
