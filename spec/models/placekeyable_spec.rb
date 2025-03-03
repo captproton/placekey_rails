@@ -70,7 +70,7 @@ RSpec.describe PlacekeyRails::Concerns::Placekeyable do
       }
 
       # Helper method for respond_to? checks
-      def respond_to?(method)
+      def respond_to?(method, include_private = false)
         [:placekey, :latitude, :longitude].include?(method) || super
       end
 
@@ -196,7 +196,7 @@ RSpec.describe PlacekeyRails::Concerns::Placekeyable do
     it 'calculates distance to another placekeyable object' do
       test_instance.placekey = '@5vg-7gq-tvz'
       other_instance.placekey = '@5vg-7gq-tvy'
-      allow(other_instance).to receive(:respond_to?).with(:placekey).and_return(true)
+      allow(other_instance).to receive(:respond_to?).with(:placekey, anything).and_return(true)
       expect(test_instance.distance_to(other_instance)).to eq(123.45)
     end
 

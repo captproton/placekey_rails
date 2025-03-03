@@ -214,7 +214,7 @@ module PlacekeyRails
     # @return [Array] Records within the distance
     def find_nearby(collection, latitude, longitude, distance, options: {})
       processor = batch_processor
-      processor.find_nearby(collection, latitude, longitude, distance, **options)
+      processor.find_nearby(collection, latitude, longitude, distance, options)
     end
 
     private

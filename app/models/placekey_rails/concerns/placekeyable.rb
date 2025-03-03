@@ -62,10 +62,12 @@ module PlacekeyRails
         other_placekey = case other
                           when String
                             other
-                          when respond_to?(:placekey)
-                            other.placekey
                           else
-                            return nil
+                            if other.respond_to?(:placekey, true)
+                              other.placekey
+                            else
+                              return nil
+                            end
                           end
 
         return nil unless other_placekey.present?

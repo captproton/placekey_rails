@@ -53,10 +53,10 @@ module PlacekeyRails
     # @param address_mapping [Hash] Mapping of model fields to address fields
     # @yield [processed, successful] Block called after each batch with progress stats
     # @return [Hash] Results of the geocoding operation
-    def geocode(collection, address_mapping = {}, &block)
+    def geocode(collection, address_mapping = {})
       ensure_client_setup
       
-      process(collection, -> (record) { geocode_record(record, address_mapping) }, &block)
+      process(collection, -> (record) { geocode_record(record, address_mapping) })
     end
 
     # Generate placekeys for a collection of records with coordinates

@@ -5,6 +5,14 @@
 
 A Ruby on Rails engine for working with [Placekeys](https://placekey.io/) - a universal standard identifier for physical places.
 
+## ⚠️ Development Status
+
+**Note:** This gem is currently in active development and not yet ready for production use. 
+Some components are stable while others are still being refined.
+
+See [DEVELOPMENT_STATUS.md](DEVELOPMENT_STATUS.md) for detailed information on the 
+current development status and known issues.
+
 ## What is Placekey?
 
 Placekey is a free, universal standard identifier for any physical place. It's designed to work across datasets and organizations, making it easier to join and analyze location data.
@@ -36,7 +44,7 @@ Example: `227@5vg-82n-kzz` where `227` is the "what" and `@5vg-82n-kzz` is the "
 Add this line to your application's Gemfile:
 
 ```ruby
-gem 'placekey_rails'
+gem 'placekey_rails', '~> 0.1.0'
 ```
 
 And then execute:

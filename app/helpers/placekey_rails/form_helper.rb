@@ -40,17 +40,16 @@ module PlacekeyRails
       wrapper_options = options.delete(:wrapper) || {}
       wrapper_class = wrapper_options.delete(:class) || "placekey-coordinates-wrapper"
       
-      lat_options = (options.delete(:latitude) || {}).merge(
-        class: 'placekey-latitude-field'
-      )
+      # Process specific field options
+      lat_options = (options.delete(:latitude) || {}).dup
+      lat_options[:class] = [lat_options[:class], 'placekey-latitude-field'].compact.join(' ')
       
-      lng_options = (options.delete(:longitude) || {}).merge(
-        class: 'placekey-longitude-field'
-      )
+      lng_options = (options.delete(:longitude) || {}).dup
+      lng_options[:class] = [lng_options[:class], 'placekey-longitude-field'].compact.join(' ')
       
-      placekey_options = (options.delete(:placekey) || {}).merge(
-        readonly: options[:readonly_placekey].nil? ? true : options[:readonly_placekey]
-      )
+      placekey_options = (options.delete(:placekey) || {}).dup
+      placekey_options[:readonly] = options[:readonly_placekey].nil? ? true : options[:readonly_placekey]
+      placekey_options[:class] = [placekey_options[:class], 'placekey-field'].compact.join(' ')
       
       auto_generate = options[:auto_generate].nil? ? true : options[:auto_generate]
       
@@ -107,6 +106,13 @@ module PlacekeyRails
       wrapper_options = options.delete(:wrapper) || {}
       wrapper_class = wrapper_options.delete(:class) || "placekey-address-wrapper"
       
+      # Field name mappings (allows customization of field names)
+      address_field = options[:address_field] || :street_address
+      city_field = options[:city_field] || :city
+      region_field = options[:region_field] || :region
+      postal_code_field = options[:postal_code_field] || :postal_code
+      country_field = options[:country_field] || :country
+      
       # Field configurations
       address_options = (options.delete(:street_address) || {}).merge(
         class: 'placekey-street-address-field'
@@ -133,13 +139,6 @@ module PlacekeyRails
       )
       
       show_lookup_button = options[:lookup_button].nil? ? true : options[:lookup_button]
-      
-      # Field name mappings (allows customization of field names)
-      address_field = options[:address_field] || :street_address
-      city_field = options[:city_field] || :city
-      region_field = options[:region_field] || :region
-      postal_code_field = options[:postal_code_field] || :postal_code
-      country_field = options[:country_field] || :country
       
       content_tag(:div, wrapper_options.merge(class: wrapper_class)) do
         if PlacekeyRails.default_client.nil?
