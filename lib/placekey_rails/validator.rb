@@ -7,20 +7,25 @@ module PlacekeyRails
     extend self
 
     # Regular expressions for placekey validation
-    WHERE_REGEX = /^[#{ALPHABET}#{REPLACEMENT_CHARS}#{PADDING_CHAR}]{3}-[#{ALPHABET}#{REPLACEMENT_CHARS}]{3}-[#{ALPHABET}#{REPLACEMENT_CHARS}]{3}$/
-    WHAT_REGEX_V1 = /^[#{ALPHABET}]{3,}(-[#{ALPHABET}]{3,})?$/
+    WHERE_REGEX = /^[23456789bcdfghjkmnpqrstvwxyz]{3}-[23456789bcdfghjkmnpqrstvwxyz]{3}-[23456789bcdfghjkmnpqrstvwxyz]{3}$/
+    WHAT_REGEX_V1 = /^[23456789bcdfghjkmnpqrstvwxyz]{3,}-[23456789bcdfghjkmnpqrstvwxyz]{3,}$/
     WHAT_REGEX_V2 = /^[01][abcdefghijklmnopqrstuvwxyz234567]{9}$/
+    PLACEKEY_REGEX = /^(@|[23456789bcdfghjkmnpqrstvwxyz]{3,}-[23456789bcdfghjkmnpqrstvwxyz]{3,}@)?[23456789bcdfghjkmnpqrstvwxyz]{3}-[23456789bcdfghjkmnpqrstvwxyz]{3}-[23456789bcdfghjkmnpqrstvwxyz]{3}$/
 
     def placekey_format_is_valid(placekey)
       begin
         parts = placekey.split("@")
-        what = parts.length > 1 ? parts[0] : nil
-        where = parts.length > 1 ? parts[1] : parts[0]
-
+        
         # If placekey starts with @, adjust the parsing
         if placekey.start_with?("@")
           what = nil
           where = placekey[1..-1]  # Remove the @ symbol
+        elsif parts.length > 1
+          what = parts[0]
+          where = parts[1]
+        else
+          what = nil
+          where = parts[0]
         end
 
         # Validate the parts
