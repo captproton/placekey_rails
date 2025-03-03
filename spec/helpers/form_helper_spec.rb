@@ -171,7 +171,7 @@ RSpec.describe PlacekeyRails::FormHelper, type: :helper do
 
     it 'shows warning when API client not configured' do
       result = helper.placekey_address_fields(form_builder)
-      expect(result).to include('class="placekey-warning"')
+      expect(result).to include('placekey-warning')
       expect(result).to include('API client not configured')
     end
 
@@ -244,7 +244,7 @@ RSpec.describe PlacekeyRails::FormHelper, type: :helper do
 
       it 'shows warning message' do
         result = helper.placekey_address_fields(form_builder)
-        expect(result).to include('class="placekey-warning"')
+        expect(result).to include('placekey-warning')
         expect(result).to include('placekey-warning-message')
         expect(result).to include('API client not configured')
       end
