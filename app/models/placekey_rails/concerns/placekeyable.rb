@@ -60,15 +60,15 @@ module PlacekeyRails
         return nil unless placekey.present?
 
         other_placekey = case other
-                          when String
-                            other
-                          else
-                            if other.respond_to?(:placekey, true)
-                              other.placekey
-                            else
-                              return nil
-                            end
-                          end
+                         when String
+                           other
+                         else
+                           if other.respond_to?(:placekey)
+                             other.placekey
+                           else
+                             return nil
+                           end
+                         end
 
         return nil unless other_placekey.present?
         PlacekeyRails.placekey_distance(placekey, other_placekey)

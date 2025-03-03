@@ -8,7 +8,7 @@ module PlacekeyRails
     # @param options [Hash] Options for the batch processor
     # @option options [Integer] :batch_size Number of records to process in each batch (default: 100)
     # @option options [Logger] :logger Logger to use for reporting progress
-    def initialize(options = {})
+    def initialize(**options)
       @batch_size = options[:batch_size] || 100
       @logger = options[:logger] || Rails.logger
       @options = options
@@ -76,7 +76,9 @@ module PlacekeyRails
     # @param distance [Float] Maximum distance in meters
     # @param placekey_field [Symbol] Field containing the placekey
     # @return [Array] Records within the distance
-    def find_nearby(collection, lat, lng, distance, placekey_field: :placekey)
+    def find_nearby(collection, lat, lng, distance, **options)
+      placekey_field = options[:placekey_field] || :placekey
+      
       log_info("Finding records within #{distance}m of (#{lat}, #{lng})")
       
       # Generate a placekey for the center point

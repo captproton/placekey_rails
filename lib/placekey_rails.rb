@@ -72,7 +72,7 @@ module PlacekeyRails
     # @param options [Hash] Options for the BatchProcessor
     # @return [BatchProcessor] The BatchProcessor instance
     def batch_processor(options = {})
-      BatchProcessor.new(options)
+      BatchProcessor.new(**options)
     end
 
     # Convenience methods at module level
@@ -202,7 +202,7 @@ module PlacekeyRails
     # @return [Hash] Results of the geocoding operation
     def batch_geocode(collection, batch_size: 100, options: {})
       processor = batch_processor(batch_size: batch_size)
-      processor.geocode(collection, options)
+      processor.geocode(collection)
     end
     
     # Find records within a specified distance of coordinates
@@ -214,7 +214,7 @@ module PlacekeyRails
     # @return [Array] Records within the distance
     def find_nearby(collection, latitude, longitude, distance, options: {})
       processor = batch_processor
-      processor.find_nearby(collection, latitude, longitude, distance, options)
+      processor.find_nearby(collection, latitude, longitude, distance, **options)
     end
 
     private
