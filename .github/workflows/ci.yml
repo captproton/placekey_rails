@@ -15,7 +15,7 @@ jobs:
       - name: Set up Ruby
         uses: ruby/setup-ruby@v1
         with:
-          ruby-version: ruby-3.2.2
+          ruby-version: '3.4.1'
           bundler-cache: true
 
       - name: Update bundle platforms
@@ -28,7 +28,7 @@ jobs:
     runs-on: ubuntu-latest
     strategy:
       matrix:
-        ruby-version: ['3.2.2']
+        ruby-version: ['3.4.1']
     
     steps:
       - name: Checkout code
