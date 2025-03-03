@@ -78,17 +78,17 @@ RSpec.describe "Performance Testing", type: :integration do
       latitude: 37.7749,
       longitude: -122.4194
     }
-    
+
     attrs = defaults.merge(options)
-    
+
     # Create the location but skip validation
     location = Location.new(attrs)
-    
+
     # Manually set a valid-format placekey to avoid validation issues
     lat = attrs[:latitude].to_i
     lng = attrs[:longitude].to_i
     location.placekey = "@#{lat}-#{lng}-xyz"
-    
+
     # Save without validation
     location.save(validate: false)
     location
@@ -109,9 +109,9 @@ RSpec.describe "Performance Testing", type: :integration do
   def create_location_grid(width, height, options = {})
     base_lat = options[:latitude] || 37.7749
     base_lng = options[:longitude] || -122.4194
-    
+
     locations = []
-    
+
     width.times do |x|
       height.times do |y|
         locations << create_test_location(
@@ -121,7 +121,7 @@ RSpec.describe "Performance Testing", type: :integration do
         )
       end
     end
-    
+
     locations
   end
 
@@ -156,67 +156,67 @@ RSpec.describe "Performance Testing", type: :integration do
 
     it "scales linearly with batch size" do
       # Test with different batch sizes to ensure linear scaling
-      batch_sizes = [10, 20, 30]
-      
+      batch_sizes = [ 10, 20, 30 ]
+
       # Introduce sleep to create more predictable and measurable timings
       batch_processor_class = Class.new(PlacekeyRails::BatchProcessor) do
         def process
           # Add a small sleep to each record processing to make timing more realistic
           records.each do |record|
             # Small sleep for more consistent timing measurements
-            sleep(0.001) 
+            sleep(0.001)
             record
           end
         end
       end
-      
+
       times = {}
-      
+
       # Process each batch size and measure time
       batch_sizes.each do |size|
         # Create locations for this batch size
         Location.destroy_all
         locations = create_test_locations(size)
-        
+
         # Process and time it
         batch_processor = batch_processor_class.new(locations)
-        
+
         # Multiple runs for more stable results
         runs = 3
         run_times = []
-        
+
         runs.times do
           start_time = Time.now
           batch_processor.process
           end_time = Time.now
           run_times << (end_time - start_time)
         end
-        
+
         # Use the median time
         times[size] = run_times.sort[runs / 2]
       end
-      
+
       # Calculate records per second for each batch size
       rps_values = {}
       times.each do |size, time|
         rps_values[size] = size / time
       end
-      
+
       # Log the results
       times.each do |size, time|
         puts "Size #{size}: #{time.round(4)} seconds, #{rps_values[size].round(2)} records/second"
       end
-      
+
       # Calculate coefficient of variation: (std dev / mean) * 100
       rps_array = rps_values.values
       mean_rps = rps_array.sum / rps_array.size
       variance_sum = rps_array.sum { |v| (v - mean_rps) ** 2 }
       std_dev = Math.sqrt(variance_sum / rps_array.size)
       coefficient_of_variation = (std_dev / mean_rps) * 100.0
-      
+
       puts "RPS values: #{rps_array.map(&:round)}"
       puts "Performance coefficient of variation: #{coefficient_of_variation.round(2)}%"
-      
+
       # For CI testing, we need a very lenient threshold
       expect(coefficient_of_variation).to be < 100.0  # Allow up to 100% variation for CI
     end
@@ -237,7 +237,7 @@ RSpec.describe "Performance Testing", type: :integration do
 
     it "efficiently finds locations within a distance" do
       # Mock the class method to return our center location
-      allow(Location).to receive(:within_distance).and_return([@center])
+      allow(Location).to receive(:within_distance).and_return([ @center ])
 
       # Get the locations near the center
       start_time = Time.now
@@ -258,7 +258,7 @@ RSpec.describe "Performance Testing", type: :integration do
 
     it "efficiently finds locations near coordinates" do
       # Mock the class method to return our center location
-      allow(Location).to receive(:near_coordinates).and_return([@center])
+      allow(Location).to receive(:near_coordinates).and_return([ @center ])
 
       # Get locations near specific coordinates
       start_time = Time.now
