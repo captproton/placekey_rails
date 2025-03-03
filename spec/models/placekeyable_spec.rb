@@ -56,13 +56,15 @@ RSpec.describe PlacekeyRails::Concerns::Placekeyable do
           return nil unless placekey.present?
 
           other_placekey = case other
-                          when String
-                            other
-                          when respond_to?(:placekey)
-                            other.placekey
-                          else
-                            return nil
-                          end
+                           when String
+                             other
+                           else
+                             if other.respond_to?(:placekey)
+                               other.placekey
+                             else
+                               return nil
+                             end
+                           end
 
           return nil unless other_placekey.present?
           PlacekeyRails.placekey_distance(placekey, other_placekey)
@@ -196,7 +198,10 @@ RSpec.describe PlacekeyRails::Concerns::Placekeyable do
     it 'calculates distance to another placekeyable object' do
       test_instance.placekey = '@5vg-7gq-tvz'
       other_instance.placekey = '@5vg-7gq-tvy'
-      allow(other_instance).to receive(:respond_to?).with(:placekey, anything).and_return(true)
+      
+      # This is the key change - don't use allow/with for respond_to? as it's already stubbed in the test class
+      # instead, make sure other_instance has a working placekey method that returns the value
+      
       expect(test_instance.distance_to(other_instance)).to eq(123.45)
     end
 

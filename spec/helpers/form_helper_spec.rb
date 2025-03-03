@@ -1,4 +1,5 @@
 require 'rails_helper'
+require 'support/test_helpers/form_helper_test_wrapper'
 
 RSpec.describe PlacekeyRails::FormHelper, type: :helper do
   let(:form_object) { double('form_object') }
@@ -12,8 +13,8 @@ RSpec.describe PlacekeyRails::FormHelper, type: :helper do
     # Allow SecureRandom to be deterministic for testing
     allow(SecureRandom).to receive(:hex).and_return('1234')
     
-    # Don't try to mock content_tag, use the actual helper method
-    # This will ensure that our HTML is properly generated
+    # Extend helper with our test wrapper
+    helper.extend(PlacekeyRails::FormHelperTestWrapper)
   end
 
   describe '#placekey_field' do
@@ -121,7 +122,7 @@ RSpec.describe PlacekeyRails::FormHelper, type: :helper do
       allow(form_builder).to receive(:object_name).and_return('place')
       
       # Ensure each field can be called
-      [:street_address, :city, :region, :postal_code, :country, :placekey].each do |field|
+      [:street_address, :city, :region, :postal_code, :country, :placekey, :address].each do |field|
         allow(form_builder).to receive(:text_field).with(field, anything).and_return('<input type="text" class="field">')
         allow(form_builder).to receive(:label).with(field, anything).and_return("<label>#{field}</label>")
       end
