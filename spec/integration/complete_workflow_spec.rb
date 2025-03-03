@@ -99,46 +99,7 @@ RSpec.describe "Complete Placekey Workflow", type: :integration do
     end
   end
   
-  describe "Form helpers integration" do
-    include ActionView::TestCase::Behavior
-    
-    it "renders placekey field with validation" do
-      # Create a test form builder
-      location = Location.new
-      form_for(location) do |form|
-        output = helper.placekey_field(form)
-        
-        # Check for key elements in the output
-        expect(output).to include('placekey-field')
-        expect(output).to include('pattern=')
-      end
-    end
-    
-    it "renders coordinate fields with auto-generation" do
-      location = Location.new
-      form_for(location) do |form|
-        output = helper.placekey_coordinate_fields(form)
-        
-        # Check for key elements in the output
-        expect(output).to include('placekey-latitude-field')
-        expect(output).to include('placekey-longitude-field')
-        expect(output).to include('placekey-field')
-        expect(output).to include('data-auto-generate="true"')
-      end
-    end
-    
-    it "renders address fields with lookup button" do
-      location = Location.new
-      form_for(location) do |form|
-        output = helper.placekey_address_fields(form)
-        
-        # Check for key elements in the output
-        expect(output).to include('placekey-street-address-field')
-        expect(output).to include('placekey-city-field')
-        expect(output).to include('placekey-lookup-button')
-      end
-    end
-  end
+  # Form helper tests are now in spec/integration/form_helper_spec.rb
   
   describe "JavaScript components integration", js: true do
     # These tests require Capybara and JavaScript support
@@ -230,7 +191,7 @@ RSpec.describe "Complete Placekey Workflow", type: :integration do
       )
       
       # Attempt to process with API error condition
-      batch_processor = PlacekeyRails::BatchProcessor.new([location])
+      batch_processor = PlacekeyRails::BatchProcessor.new(Location.all)
       results = batch_processor.process
       
       # Verify error is captured

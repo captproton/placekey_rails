@@ -5,7 +5,7 @@ git_source(:github) { |repo| "https://github.com/#{repo}.git" }
 gemspec
 
 gem "puma"
-gem "sqlite3"
+gem "pg", "~> 1.5.4"  # PostgreSQL adapter instead of SQLite
 gem "propshaft"
 
 # Omakase Ruby styling [https://github.com/rails/rubocop-rails-omakase/]
