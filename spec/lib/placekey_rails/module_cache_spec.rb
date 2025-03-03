@@ -37,10 +37,10 @@ RSpec.describe PlacekeyRails do
       it "clears the cache when enabled" do
         PlacekeyRails.enable_caching
         cache = PlacekeyRails.cache
-        
+
         # Mock the clear method on the cache instance
         expect(cache).to receive(:clear).once
-        
+
         PlacekeyRails.clear_cache
       end
 

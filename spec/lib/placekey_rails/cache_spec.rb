@@ -23,13 +23,13 @@ RSpec.describe PlacekeyRails::Cache do
       cache.set("key1", "value1")
       cache.set("key2", "value2")
       cache.set("key3", "value3")
-      
+
       # Access key1 to make it most recently used
       cache.get("key1")
-      
+
       # Add a new key to evict the least recently used
       cache.set("key4", "value4")
-      
+
       # key2 should be evicted as it's now the least recently used
       expect(cache.key?("key1")).to be true
       expect(cache.key?("key2")).to be false
@@ -54,10 +54,10 @@ RSpec.describe PlacekeyRails::Cache do
       cache.set("key1", "value1")
       cache.set("key2", "value2")
       cache.set("key3", "value3")
-      
+
       # Adding a 4th item should evict the oldest (key1)
       cache.set("key4", "value4")
-      
+
       expect(cache.key?("key1")).to be false
       expect(cache.key?("key2")).to be true
       expect(cache.key?("key3")).to be true
@@ -69,9 +69,9 @@ RSpec.describe PlacekeyRails::Cache do
     it "removes all items from the cache" do
       cache.set("key1", "value1")
       cache.set("key2", "value2")
-      
+
       cache.clear
-      
+
       expect(cache.size).to eq(0)
       expect(cache.key?("key1")).to be false
       expect(cache.key?("key2")).to be false
@@ -81,13 +81,13 @@ RSpec.describe PlacekeyRails::Cache do
   describe "#size" do
     it "returns the number of items in the cache" do
       expect(cache.size).to eq(0)
-      
+
       cache.set("key1", "value1")
       expect(cache.size).to eq(1)
-      
+
       cache.set("key2", "value2")
       expect(cache.size).to eq(2)
-      
+
       cache.set("key1", "updated-value")
       expect(cache.size).to eq(2)
     end
@@ -97,7 +97,7 @@ RSpec.describe PlacekeyRails::Cache do
     it "returns all keys in the cache" do
       cache.set("key1", "value1")
       cache.set("key2", "value2")
-      
+
       expect(cache.keys).to contain_exactly("key1", "key2")
     end
   end
@@ -107,13 +107,13 @@ RSpec.describe PlacekeyRails::Cache do
       cache.set("key1", "value1")
       cache.set("key2", "value2")
       cache.set("key3", "value3")
-      
+
       # Check if key1 exists but don't update its access order
       expect(cache.key?("key1")).to be true
-      
+
       # Add a new key to evict the least recently used
       cache.set("key4", "value4")
-      
+
       # key1 should be evicted as it remained the least recently used
       expect(cache.key?("key1")).to be false
     end

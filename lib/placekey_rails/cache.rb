@@ -7,7 +7,7 @@ module PlacekeyRails
       @access_order = []
       @mutex = Mutex.new
     end
-    
+
     def get(key)
       @mutex.synchronize do
         if @cache.key?(key)
@@ -19,7 +19,7 @@ module PlacekeyRails
         nil
       end
     end
-    
+
     def set(key, value)
       @mutex.synchronize do
         # If key already exists, update access order
@@ -30,29 +30,29 @@ module PlacekeyRails
           lru_key = @access_order.shift
           @cache.delete(lru_key)
         end
-        
+
         # Add the new key-value pair
         @cache[key] = value
         @access_order.push(key)
         value
       end
     end
-    
+
     def clear
       @mutex.synchronize do
         @cache.clear
         @access_order.clear
       end
     end
-    
+
     def size
       @cache.size
     end
-    
+
     def keys
       @cache.keys
     end
-    
+
     # Check if a key exists in cache without affecting access order
     def key?(key)
       @cache.key?(key)

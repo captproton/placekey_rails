@@ -2,12 +2,12 @@ require 'rails_helper'
 
 RSpec.describe PlacekeyRails::PlacekeyHelper, type: :helper do
   before do
-    allow(PlacekeyRails::Converter).to receive(:parse_placekey).with('@5vg-7gq-tvz').and_return([nil, '5vg-7gq-tvz'])
-    allow(PlacekeyRails::Converter).to receive(:parse_placekey).with('227-223@5vg-82n-pgk').and_return(['227-223', '5vg-82n-pgk'])
+    allow(PlacekeyRails::Converter).to receive(:parse_placekey).with('@5vg-7gq-tvz').and_return([ nil, '5vg-7gq-tvz' ])
+    allow(PlacekeyRails::Converter).to receive(:parse_placekey).with('227-223@5vg-82n-pgk').and_return([ '227-223', '5vg-82n-pgk' ])
     allow(PlacekeyRails).to receive(:placekey_format_is_valid).with('@5vg-7gq-tvz').and_return(true)
     allow(PlacekeyRails).to receive(:placekey_format_is_valid).with('invalid-format').and_return(false)
-    allow(PlacekeyRails).to receive(:placekey_to_geo).with('@5vg-7gq-tvz').and_return([37.7371, -122.44283])
-    allow(PlacekeyRails).to receive(:placekey_to_hex_boundary).and_return([[37.7, -122.4], [37.7, -122.5]])
+    allow(PlacekeyRails).to receive(:placekey_to_geo).with('@5vg-7gq-tvz').and_return([ 37.7371, -122.44283 ])
+    allow(PlacekeyRails).to receive(:placekey_to_hex_boundary).and_return([ [ 37.7, -122.4 ], [ 37.7, -122.5 ] ])
     allow(PlacekeyRails).to receive(:placekey_to_geojson).and_return({ "type" => "Polygon" })
   end
 
@@ -57,7 +57,7 @@ RSpec.describe PlacekeyRails::PlacekeyHelper, type: :helper do
     end
 
     it 'returns map data for array of placekeys' do
-      result = helper.placekeys_map_data(['@5vg-7gq-tvz'])
+      result = helper.placekeys_map_data([ '@5vg-7gq-tvz' ])
       expect(result).to be_an(Array)
       expect(result.first[:placekey]).to eq('@5vg-7gq-tvz')
     end

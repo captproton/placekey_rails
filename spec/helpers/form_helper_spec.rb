@@ -45,7 +45,7 @@ RSpec.describe PlacekeyRails::FormHelper, type: :helper do
     it 'uses custom help text when provided' do
       expect(form_builder).to receive(:text_field).with(
         :placekey,
-        hash_including(:class => 'placekey-field')
+        hash_including(class: 'placekey-field')
       ).and_return('<input type="text" class="placekey-field">')
 
       helper.placekey_field(form_builder, help: 'Custom help text')
@@ -151,7 +151,7 @@ RSpec.describe PlacekeyRails::FormHelper, type: :helper do
       # Setup for address fields with blocks
       allow(form_builder).to receive(:text_field) { '<input type="text">' }
 
-      [:street_address, :city, :region, :postal_code, :country, :placekey, :address].each do |field|
+      [ :street_address, :city, :region, :postal_code, :country, :placekey, :address ].each do |field|
         allow(form_builder).to receive(:text_field).with(field, anything) { '<input type="text" class="field">' }
         allow(form_builder).to receive(:label).with(field, anything) { "<label>#{field}</label>" }
       end

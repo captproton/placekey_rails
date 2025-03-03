@@ -2,13 +2,13 @@ require 'rails_helper'
 
 # Rather than trying to mock ActiveRecord callbacks for testing,
 # we'll focus on testing individual methods from the concern directly.
-# This approach avoids dealing with database connectivity while 
+# This approach avoids dealing with database connectivity while
 # still verifying the core functionality.
 
 RSpec.describe PlacekeyRails::Concerns::Placekeyable do
   # Extract the module methods we want to test
   let(:placekeyable_module) { PlacekeyRails::Concerns::Placekeyable }
-  
+
   # Create a simple test class with the methods we need to test
   let(:test_class) do
     Class.new do
@@ -56,15 +56,15 @@ RSpec.describe PlacekeyRails::Concerns::Placekeyable do
           return nil unless placekey.present?
 
           other_placekey = case other
-                           when String
+          when String
                              other
-                           else
+          else
                              if other.respond_to?(:placekey)
                                other.placekey
                              else
                                return nil
                              end
-                           end
+          end
 
           return nil unless other_placekey.present?
           PlacekeyRails.placekey_distance(placekey, other_placekey)
@@ -73,7 +73,7 @@ RSpec.describe PlacekeyRails::Concerns::Placekeyable do
 
       # Helper method for respond_to? checks
       def respond_to?(method, include_private = false)
-        [:placekey, :latitude, :longitude].include?(method) || super
+        [ :placekey, :latitude, :longitude ].include?(method) || super
       end
 
       # Helper method for presence checks
@@ -82,18 +82,18 @@ RSpec.describe PlacekeyRails::Concerns::Placekeyable do
       end
     end
   end
-  
+
   let(:test_instance) { test_class.new }
   let(:other_instance) { test_class.new }
 
   before do
     # Mock the PlacekeyRails module methods
     allow(PlacekeyRails).to receive(:geo_to_placekey).and_return('@5vg-7gq-tvz')
-    allow(PlacekeyRails).to receive(:placekey_to_geo).and_return([37.7371, -122.44283])
+    allow(PlacekeyRails).to receive(:placekey_to_geo).and_return([ 37.7371, -122.44283 ])
     allow(PlacekeyRails).to receive(:placekey_to_h3).and_return('8a2830828767fff')
-    allow(PlacekeyRails).to receive(:placekey_to_hex_boundary).and_return([[37.7, -122.4], [37.7, -122.5]])
+    allow(PlacekeyRails).to receive(:placekey_to_hex_boundary).and_return([ [ 37.7, -122.4 ], [ 37.7, -122.5 ] ])
     allow(PlacekeyRails).to receive(:placekey_to_geojson).and_return({ "type" => "Polygon" })
-    allow(PlacekeyRails).to receive(:get_neighboring_placekeys).and_return(['@5vg-7gq-tvz', '@5vg-7gq-tvy'])
+    allow(PlacekeyRails).to receive(:get_neighboring_placekeys).and_return([ '@5vg-7gq-tvz', '@5vg-7gq-tvy' ])
     allow(PlacekeyRails).to receive(:placekey_distance).and_return(123.45)
     allow(PlacekeyRails).to receive(:default_client).and_return(double('client'))
     allow(PlacekeyRails).to receive(:lookup_placekeys).and_return([
@@ -137,7 +137,7 @@ RSpec.describe PlacekeyRails::Concerns::Placekeyable do
   describe '#placekey_to_geo' do
     it 'returns coordinates from placekey' do
       test_instance.placekey = '@5vg-7gq-tvz'
-      expect(test_instance.placekey_to_geo).to eq([37.7371, -122.44283])
+      expect(test_instance.placekey_to_geo).to eq([ 37.7371, -122.44283 ])
     end
 
     it 'returns nil when placekey is missing' do
@@ -159,7 +159,7 @@ RSpec.describe PlacekeyRails::Concerns::Placekeyable do
   describe '#placekey_boundary' do
     it 'returns boundary coordinates for placekey' do
       test_instance.placekey = '@5vg-7gq-tvz'
-      expect(test_instance.placekey_boundary).to eq([[37.7, -122.4], [37.7, -122.5]])
+      expect(test_instance.placekey_boundary).to eq([ [ 37.7, -122.4 ], [ 37.7, -122.5 ] ])
     end
 
     it 'returns nil when placekey is missing' do
@@ -181,7 +181,7 @@ RSpec.describe PlacekeyRails::Concerns::Placekeyable do
   describe '#neighboring_placekeys' do
     it 'returns neighboring placekeys' do
       test_instance.placekey = '@5vg-7gq-tvz'
-      expect(test_instance.neighboring_placekeys).to eq(['@5vg-7gq-tvz', '@5vg-7gq-tvy'])
+      expect(test_instance.neighboring_placekeys).to eq([ '@5vg-7gq-tvz', '@5vg-7gq-tvy' ])
     end
 
     it 'returns empty array when placekey is missing' do
@@ -198,10 +198,10 @@ RSpec.describe PlacekeyRails::Concerns::Placekeyable do
     it 'calculates distance to another placekeyable object' do
       test_instance.placekey = '@5vg-7gq-tvz'
       other_instance.placekey = '@5vg-7gq-tvy'
-      
+
       # This is the key change - don't use allow/with for respond_to? as it's already stubbed in the test class
       # instead, make sure other_instance has a working placekey method that returns the value
-      
+
       expect(test_instance.distance_to(other_instance)).to eq(123.45)
     end
 
@@ -221,7 +221,7 @@ RSpec.describe PlacekeyRails::Concerns::Placekeyable do
     # we would add integration tests with actual database connections
     # but that's beyond the scope of our unit tests here.
     # Instead, we'll just test that the module defines these methods.
-    
+
     it "defines class methods for spatial operations" do
       # Check that the module's ClassMethods defines these methods
       class_methods = PlacekeyRails::Concerns::Placekeyable::ClassMethods

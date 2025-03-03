@@ -1,7 +1,7 @@
 PATH
   remote: .
   specs:
-    placekey_rails (0.1.0)
+    placekey_rails (0.2.0)
       h3 (~> 3.7.2)
       httparty (~> 0.22.0)
       jsbundling-rails

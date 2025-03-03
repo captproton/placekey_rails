@@ -16,13 +16,13 @@ PlacekeyRails.enable_caching(max_size: 1000)
 PlacekeyRails.configure do |config|
   # Default country code to use for address lookups when not specified
   config.default_country_code = 'US'
-  
+
   # Whether to validate placekeys automatically
   config.validate_placekeys = true
-  
+
   # Default timeout for API requests (in seconds)
   config.api_timeout = 10
-  
+
   # Whether to raise exceptions on API errors
   config.raise_on_api_error = Rails.env.development?
 end

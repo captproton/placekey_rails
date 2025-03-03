@@ -21,7 +21,7 @@ module PlacekeyRails
   @default_client = nil
   @cache = nil
   @config = {
-    default_country_code: 'US',
+    default_country_code: "US",
     validate_placekeys: true,
     api_timeout: 10,
     raise_on_api_error: false
@@ -30,7 +30,7 @@ module PlacekeyRails
   class << self
     # Accessor for the default client
     attr_reader :default_client
-    
+
     # Access the configuration hash
     attr_reader :config
 
@@ -40,26 +40,26 @@ module PlacekeyRails
     def setup_client(api_key, options = {})
       @default_client = Client.new(api_key, options)
     end
-    
+
     # Enable caching to improve performance
     # @param max_size [Integer] Maximum number of items to cache
     # @return [Cache] The cache instance
     def enable_caching(max_size: 1000)
       @cache = Cache.new(max_size)
     end
-    
+
     # Get the current cache instance
     # @return [Cache, nil] The cache instance or nil if caching is not enabled
     def cache
       @cache
     end
-    
+
     # Clear the cache
     # @return [void]
     def clear_cache
       @cache&.clear
     end
-    
+
     # Configure the PlacekeyRails module
     # @yield [config] Block to configure the module
     # @return [Hash] The configuration hash
@@ -67,7 +67,7 @@ module PlacekeyRails
       yield @config if block_given?
       @config
     end
-    
+
     # Create a new BatchProcessor for optimized operations
     # @param options [Hash] Options for the BatchProcessor
     # @return [BatchProcessor] The BatchProcessor instance
@@ -194,7 +194,7 @@ module PlacekeyRails
       ensure_client_setup
       default_client.placekey_dataframe(dataframe, column_mapping, fields, batch_size, verbose)
     end
-    
+
     # Batch geocode records that have addresses but no placekeys
     # @param collection [ActiveRecord::Relation, Array] Collection to geocode
     # @param batch_size [Integer] Number of records to process in each batch
@@ -204,7 +204,7 @@ module PlacekeyRails
       processor = batch_processor(batch_size: batch_size)
       processor.geocode(collection)
     end
-    
+
     # Find records within a specified distance of coordinates
     # @param collection [ActiveRecord::Relation, Array] Collection to search
     # @param latitude [Float] Latitude of the center point

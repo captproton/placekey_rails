@@ -16,7 +16,7 @@ module PlacekeyRails
       begin
         # Quick overall pattern check first
         return false unless PLACEKEY_REGEX.match?(placekey)
-        
+
         if placekey.start_with?("@")
           # Format is @where
           what = nil

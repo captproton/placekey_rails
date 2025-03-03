@@ -10,5 +10,19 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema[8.0].define(version: 0) do
+ActiveRecord::Schema[8.0].define(version: 2025_03_02_000001) do
+  create_table "locations", force: :cascade do |t|
+    t.string "name"
+    t.float "latitude"
+    t.float "longitude"
+    t.string "placekey"
+    t.string "street_address"
+    t.string "city"
+    t.string "region"
+    t.string "postal_code"
+    t.string "country"
+    t.datetime "created_at", null: false
+    t.datetime "updated_at", null: false
+    t.index [ "placekey" ], name: "index_locations_on_placekey"
+  end
 end
