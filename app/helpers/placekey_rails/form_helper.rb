@@ -37,6 +37,9 @@ module PlacekeyRails
     # @param form [FormBuilder] The form builder instance
     # @param options [Hash] Additional options for the fields
     def placekey_coordinate_fields(form, options = {})
+      latitude_options = options[:latitude] || {}
+      longitude_options = options[:longitude] || {}
+      
       content_tag(:div, class: "placekey-coordinate-fields") do
         placekey_options = {
           class: "placekey-field",
@@ -45,8 +48,8 @@ module PlacekeyRails
         }
 
         safe_join([
-          field_group(form, :latitude, "Latitude", class: "placekey-latitude-field"),
-          field_group(form, :longitude, "Longitude", class: "placekey-longitude-field"),
+          field_group(form, :latitude, "Latitude", latitude_options.merge(class: "placekey-latitude-field")),
+          field_group(form, :longitude, "Longitude", longitude_options.merge(class: "placekey-longitude-field")),
           field_group(form, :placekey, "Placekey", placekey_options)
         ])
       end
@@ -58,6 +61,7 @@ module PlacekeyRails
     def placekey_address_fields(form, options = {})
       wrapper_classes = [ "placekey-address-wrapper" ]
       wrapper_classes << "placekey-warning" if PlacekeyRails.default_client.nil?
+      wrapper_classes << "placekey-compact" if options[:compact_layout]
 
       content_tag(:div, class: wrapper_classes.join(" ")) do
         safe_join([
@@ -76,24 +80,31 @@ module PlacekeyRails
 
     def render_address_fields(form, options)
       fields = default_fields.merge(options.slice(*default_fields.keys))
+      field_classes = options[:field_classes] || {}
+      
+      # Extract label customizations
+      address_label = options[:address_label] || "Street Address"
+      city_label = options[:city_label] || "City"
+      region_label = options[:region_label] || "Region"
+      postal_code_label = options[:postal_code_label] || "Postal Code"
 
       content_tag(:div, class: "placekey-fields-container") do
         safe_join([
-          field_group(form, fields[:address_field], "Street Address",
-            class: "placekey-street-address-field"),
-          field_group(form, fields[:city_field], "City",
-            class: "placekey-city-field"),
-          field_group(form, fields[:region_field], "Region",
-            class: "placekey-region-field"),
-          field_group(form, fields[:postal_code_field], "Postal Code",
-            class: "placekey-postal-code-field")
+          field_group(form, fields[:address_field], address_label,
+            { class: "placekey-street-address-field" }.merge(field_classes[:address] || {})),
+          field_group(form, fields[:city_field], city_label,
+            { class: "placekey-city-field" }.merge(field_classes[:city] || {})),
+          field_group(form, fields[:region_field], region_label,
+            { class: "placekey-region-field" }.merge(field_classes[:region] || {})),
+          field_group(form, fields[:postal_code_field], postal_code_label,
+            { class: "placekey-postal-code-field" }.merge(field_classes[:postal_code] || {}))
         ])
       end
     end
 
     def default_fields
       {
-        address_field: :address,
+        address_field: :street_address,
         city_field: :city,
         region_field: :region,
         postal_code_field: :postal_code
@@ -101,10 +112,12 @@ module PlacekeyRails
     end
 
     def field_group(form, field, label_text, field_options = {})
+      field_class = field_options.delete(:class) || ""
+      
       content_tag(:div, class: "placekey-field-group") do
         safe_join([
           form.label(field, label_text),
-          form.text_field(field, field_options)
+          form.text_field(field, field_options.merge(class: field_class))
         ])
       end
     end
