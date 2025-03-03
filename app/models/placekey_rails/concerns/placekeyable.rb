@@ -63,7 +63,7 @@ module PlacekeyRails
         when String
                            other
         else
-                           if other.respond_to?(:placekey)
+                           if other.respond_to?(:placekey, true)
                              other.placekey
                            else
                              return nil
