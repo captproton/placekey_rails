@@ -16,13 +16,13 @@ module PlacekeyRails
 
       readonly = options[:readonly_placekey].nil? ? true : options[:readonly_placekey]
       auto_generate = options.fetch(:auto_generate, true)
-      
+
       placekey_options = {
         readonly: readonly,
         class: 'placekey-field',
         data: { auto_generate: auto_generate }
       }
-      
+
       form.text_field(:placekey, placekey_options)
 
       # Return a string to simulate HTML output with all the expected classes and attributes
@@ -48,13 +48,13 @@ module PlacekeyRails
       city_field = options[:city_field] || :city
       region_field = options[:region_field] || :region
       postal_code_field = options[:postal_code_field] || :postal_code
-      
+
       # Create expected field classes based on the field mapping
       address_class = "placekey-street-address-field"
       city_class = "placekey-city-field"
       region_class = "placekey-region-field"
       postal_code_class = "placekey-postal-code-field"
-      
+
       # Handle field_classes option if provided
       field_classes = options[:field_classes] || {}
       if field_classes[:address]
@@ -64,13 +64,13 @@ module PlacekeyRails
       # Call text_field with expected arguments for the tests
       form.text_field(address_field, hash_including(class: address_class))
       form.label(address_field, anything)
-      
+
       form.text_field(city_field, hash_including(class: city_class))
       form.label(city_field, anything)
-      
+
       form.text_field(region_field, hash_including(class: region_class))
       form.label(region_field, anything)
-      
+
       form.text_field(postal_code_field, hash_including(class: postal_code_class))
       form.label(postal_code_field, anything)
 

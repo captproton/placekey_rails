@@ -39,7 +39,7 @@ module PlacekeyRails
     def placekey_coordinate_fields(form, options = {})
       latitude_options = options[:latitude] || {}
       longitude_options = options[:longitude] || {}
-      
+
       content_tag(:div, class: "placekey-coordinate-fields") do
         placekey_options = {
           class: "placekey-field",
@@ -81,7 +81,7 @@ module PlacekeyRails
     def render_address_fields(form, options)
       fields = default_fields.merge(options.slice(*default_fields.keys))
       field_classes = options[:field_classes] || {}
-      
+
       # Extract label customizations
       address_label = options[:address_label] || "Street Address"
       city_label = options[:city_label] || "City"
@@ -113,7 +113,7 @@ module PlacekeyRails
 
     def field_group(form, field, label_text, field_options = {})
       field_class = field_options.delete(:class) || ""
-      
+
       content_tag(:div, class: "placekey-field-group") do
         safe_join([
           form.label(field, label_text),
