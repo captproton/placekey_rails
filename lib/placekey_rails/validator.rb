@@ -14,26 +14,31 @@ module PlacekeyRails
 
     def placekey_format_is_valid(placekey)
       begin
-        parts = placekey.split("@")
+        # Quick overall pattern check first
+        return false unless PLACEKEY_REGEX.match?(placekey)
         
-        # If placekey starts with @, adjust the parsing
         if placekey.start_with?("@")
+          # Format is @where
           what = nil
-          where = placekey[1..-1]  # Remove the @ symbol
-        elsif parts.length > 1
+          where = placekey[1..-1] # Remove the @ symbol
+        elsif placekey.include?("@")
+          # Format is what@where
+          parts = placekey.split("@")
           what = parts[0]
           where = parts[1]
         else
+          # No @ symbol, assume it's just the where part
           what = nil
-          where = parts[0]
+          where = placekey
         end
 
-        # Validate the parts
+        # Validate what part if present
         if what
           what_valid = (WHAT_REGEX_V1.match?(what) || WHAT_REGEX_V2.match?(what))
           return false unless what_valid
         end
 
+        # Validate where part
         where_part_is_valid(where)
       rescue StandardError => e
         false
