@@ -1,0 +1,46 @@
+<h1>Batch Processing Results</h1>
+
+<div class="results-summary">
+  <p>Processed <%= @results.size %> locations.</p>
+  <p>Successfully updated: <%= @results.count { |r| r[:success] } %></p>
+  <p>Failed: <%= @results.count { |r| !r[:success] } %></p>
+</div>
+
+<table>
+  <thead>
+    <tr>
+      <th>ID</th>
+      <th>Name</th>
+      <th>Original Placekey</th>
+      <th>New Placekey</th>
+      <th>Status</th>
+    </tr>
+  </thead>
+
+  <tbody>
+    <% @results.each do |result| %>
+      <tr class="<%= result[:success] ? 'success' : 'error' %>">
+        <td><%= result[:id] %></td>
+        <td><%= result[:name] %></td>
+        <td><%= result[:original_placekey] %></td>
+        <td><%= result[:placekey] %></td>
+        <td>
+          <% if result[:success] %>
+            Success
+          <% else %>
+            Error: <%= result[:error] %>
+          <% end %>
+        </td>
+      </tr>
+    <% end %>
+  </tbody>
+</table>
+
+<br>
+
+<%= link_to 'Back to Locations', locations_path %>
+
+<!-- Placekey Map Display for all locations -->
+<div class="placekey-map-container" style="height: 600px; margin-top: 20px;">
+  <%= placekey_map(Location.all, height: "100%") %>
+</div>
