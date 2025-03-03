@@ -1,5 +1,5 @@
 class LocationsController < ApplicationController
-  before_action :set_location, only: [:show, :edit, :update, :destroy]
+  before_action :set_location, only: [ :show, :edit, :update, :destroy ]
 
   def index
     @locations = Location.all
@@ -60,7 +60,7 @@ class LocationsController < ApplicationController
   def batch_process
     @batch_processor = PlacekeyRails::BatchProcessor.new(Location.all)
     @results = @batch_processor.process
-    
+
     respond_to do |format|
       format.html
       format.json { render json: @results }
@@ -73,7 +73,7 @@ class LocationsController < ApplicationController
     end
 
     def location_params
-      params.require(:location).permit(:name, :latitude, :longitude, :placekey, 
+      params.require(:location).permit(:name, :latitude, :longitude, :placekey,
                                       :street_address, :city, :region, :postal_code, :country)
     end
 end

@@ -2,11 +2,11 @@ module PlacekeyRails
   # A simplified BatchProcessor for testing
   class TestBatchProcessor
     attr_reader :records
-    
+
     def initialize(records)
       @records = records
     end
-    
+
     def process
       records.map do |record|
         begin
@@ -15,7 +15,7 @@ module PlacekeyRails
             record.generate_placekey
             record.save
           end
-          
+
           {
             id: record.id,
             name: record.name,

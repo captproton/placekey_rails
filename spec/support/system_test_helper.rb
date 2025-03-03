@@ -35,7 +35,7 @@ end
 # Helper method to take screenshots
 def take_screenshot(name = nil)
   return unless defined?(page) && page.respond_to?(:save_screenshot)
-  
+
   name ||= "screenshot_#{Time.now.utc.strftime('%Y%m%d%H%M%S')}.png"
   path = File.join(Rails.root, 'tmp', name)
   page.save_screenshot(path)
@@ -46,7 +46,7 @@ end
 class GetProcessMem
   def self.new
     require 'benchmark'
-    
+
     obj = Object.new
     def obj.mb
       # Basic memory estimation - not as accurate as the real gem
@@ -56,7 +56,7 @@ class GetProcessMem
     rescue
       0
     end
-    
+
     obj
   end
 end
