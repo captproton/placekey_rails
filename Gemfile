@@ -5,7 +5,7 @@ git_source(:github) { |repo| "https://github.com/#{repo}.git" }
 gemspec
 
 gem "puma"
-gem "sqlite3"
+gem "pg", "~> 1.5.4"  # PostgreSQL adapter instead of SQLite
 gem "propshaft"
 
 # Omakase Ruby styling [https://github.com/rails/rubocop-rails-omakase/]
@@ -31,4 +31,8 @@ group :development, :test do
   gem "rubocop-rails", "~> 2.30.2"
   gem "rubocop-rspec", "~> 3.5.0"
   gem "yard", "~> 0.9.37"
+
+  # For JavaScript testing
+  gem "selenium-webdriver", "~> 4.19.0"
+  gem "capybara", "~> 3.40.0"
 end

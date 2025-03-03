@@ -15,7 +15,7 @@ jobs:
       - name: Set up Ruby
         uses: ruby/setup-ruby@v1
         with:
-          ruby-version: ruby-3.2.2
+          ruby-version: '3.4.1'
           bundler-cache: true
 
       - name: Update bundle platforms
@@ -26,32 +26,59 @@ jobs:
 
   test:
     runs-on: ubuntu-latest
-    strategy:
-      matrix:
-        ruby-version: ['3.2.2']
     
+    services:
+      postgres:
+        image: postgres:14
+        env:
+          POSTGRES_USER: postgres
+          POSTGRES_PASSWORD: postgres
+          POSTGRES_DB: placekey_rails_test
+        ports:
+          - 5432:5432
+        options: >-
+          --health-cmd pg_isready
+          --health-interval 10s
+          --health-timeout 5s
+          --health-retries 5
+
     steps:
-      - name: Checkout code
-        uses: actions/checkout@v4
-      
-      - name: Install system dependencies
-        run: |
-          sudo apt-get update
-          sudo apt-get install -y cmake
+      - uses: actions/checkout@v4
       
       - name: Set up Ruby
         uses: ruby/setup-ruby@v1
         with:
-          ruby-version: ${{ matrix.ruby-version }}
-          bundler-cache: true # runs 'bundle install' and caches installed gems automatically
+          ruby-version: '3.4.1'
+          bundler-cache: true
+
+      - name: Install dependencies
+        run: bundle install
       
-      - name: Update bundle platforms
-        run: bundle lock --add-platform x86_64-linux
+      - name: Set up database.yml
+        run: |
+          cat > spec/dummy/config/database.yml << EOL
+          test:
+            adapter: postgresql
+            encoding: unicode
+            database: placekey_rails_test
+            username: postgres
+            password: postgres
+            host: localhost
+            port: 5432
+          EOL
       
-      - name: Set up test database
+      - name: Create and set up database
         run: |
           cd spec/dummy
           bin/rails db:create db:schema:load RAILS_ENV=test
-      
+        env:
+          RAILS_ENV: test
+          POSTGRES_USER: postgres
+          POSTGRES_PASSWORD: postgres
+          
       - name: Run tests
         run: bundle exec rspec
+        env:
+          RAILS_ENV: test
+          POSTGRES_USER: postgres
+          POSTGRES_PASSWORD: postgres
