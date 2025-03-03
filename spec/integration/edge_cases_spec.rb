@@ -73,7 +73,14 @@ RSpec.describe "PlacekeyRails Edge Cases", type: :integration do
     end
     
     it "handles nil coordinates gracefully" do
-      location = Location.create!(name: "No Coordinates")
+      # Force create a location with nil placekey
+      location = Location.new(
+        name: "No Coordinates",
+        latitude: nil,
+        longitude: nil,
+        placekey: nil
+      )
+      location.save(validate: false)
       
       # Should not have a placekey
       expect(location.placekey).to be_nil
@@ -121,11 +128,11 @@ RSpec.describe "PlacekeyRails Edge Cases", type: :integration do
   describe "API error handling" do
     it "handles API connection errors" do
       # Make the batch processor return an error
-      allow_any_instance_of(PlacekeyRails::TestBatchProcessor).to receive(:process) do
+      allow_any_instance_of(PlacekeyRails::BatchProcessor).to receive(:process) do
         [{ id: 1, name: "Test", success: false, error: "Connection refused" }]
       end
       
-      location = Location.create!(
+      location = create_test_location(
         name: "API Error Test",
         latitude: 37.7749,
         longitude: -122.4194
@@ -140,11 +147,11 @@ RSpec.describe "PlacekeyRails Edge Cases", type: :integration do
     
     it "handles API authentication errors" do
       # Make the batch processor return an error
-      allow_any_instance_of(PlacekeyRails::TestBatchProcessor).to receive(:process) do
+      allow_any_instance_of(PlacekeyRails::BatchProcessor).to receive(:process) do
         [{ id: 1, name: "Test", success: false, error: "Unauthorized" }]
       end
       
-      location = Location.create!(
+      location = create_test_location(
         name: "Auth Error Test",
         latitude: 37.7749,
         longitude: -122.4194
@@ -159,7 +166,7 @@ RSpec.describe "PlacekeyRails Edge Cases", type: :integration do
     
     it "handles rate limit errors" do
       # Make the batch processor simulate some successful and some failed
-      allow_any_instance_of(PlacekeyRails::TestBatchProcessor).to receive(:process) do
+      allow_any_instance_of(PlacekeyRails::BatchProcessor).to receive(:process) do
         [
           { id: 1, name: "Success", success: true, placekey: "@37--122-xyz" },
           { id: 2, name: "Failed", success: false, error: "Rate limit exceeded" }
@@ -167,14 +174,7 @@ RSpec.describe "PlacekeyRails Edge Cases", type: :integration do
       end
       
       # Create multiple locations
-      locations = []
-      3.times do |i|
-        locations << Location.create!(
-          name: "Rate Limit Test #{i}",
-          latitude: 37.7749 + (i * 0.01),
-          longitude: -122.4194 - (i * 0.01)
-        )
-      end
+      locations = create_test_locations(3)
       
       # The batch processor should handle the rate limit
       batch_processor = PlacekeyRails::BatchProcessor.new(locations)
@@ -187,11 +187,11 @@ RSpec.describe "PlacekeyRails Edge Cases", type: :integration do
     
     it "handles malformed API responses" do
       # Make the batch processor return an error
-      allow_any_instance_of(PlacekeyRails::TestBatchProcessor).to receive(:process) do
+      allow_any_instance_of(PlacekeyRails::BatchProcessor).to receive(:process) do
         [{ id: 1, name: "Test", success: false, error: "Invalid response" }]
       end
       
-      location = Location.create!(
+      location = create_test_location(
         name: "Bad Response Test",
         latitude: 37.7749,
         longitude: -122.4194
@@ -208,14 +208,7 @@ RSpec.describe "PlacekeyRails Edge Cases", type: :integration do
   describe "Large dataset performance" do
     it "processes large batches efficiently" do
       # Create a smaller set of locations (using a small count for faster tests)
-      locations = []
-      3.times do |i|
-        locations << Location.create!(
-          name: "Performance Test #{i}",
-          latitude: 37.7749 + (i * 0.01),
-          longitude: -122.4194 - (i * 0.01)
-        )
-      end
+      locations = create_test_locations(3)
       
       # Time the batch processing
       batch_processor = PlacekeyRails::BatchProcessor.new(locations)
@@ -234,14 +227,7 @@ RSpec.describe "PlacekeyRails Edge Cases", type: :integration do
     
     it "handles batch size configuration properly" do
       # Create test locations (just a few for faster tests)
-      locations = []
-      3.times do |i|
-        locations << Location.create!(
-          name: "Batch Size Test #{i}",
-          latitude: 37.7749 + (i * 0.01),
-          longitude: -122.4194 - (i * 0.01)
-        )
-      end
+      locations = create_test_locations(3)
       
       # Process all locations
       batch_processor = PlacekeyRails::BatchProcessor.new(locations)
@@ -259,7 +245,7 @@ RSpec.describe "PlacekeyRails Edge Cases", type: :integration do
       )
       
       # Try to create a location that would trigger geocoding
-      location = Location.create!(
+      location = create_test_location(
         name: "Geocoding Test",
         street_address: "123 Main St",
         city: "San Francisco",
@@ -268,17 +254,17 @@ RSpec.describe "PlacekeyRails Edge Cases", type: :integration do
         country: "US"
       )
       
-      # It should still save, just without a placekey
+      # It should still save
       expect(location.persisted?).to be true
     end
     
     it "recovers from temporary failures" do
       # Make the batch processor return a success
-      allow_any_instance_of(PlacekeyRails::TestBatchProcessor).to receive(:process) do
+      allow_any_instance_of(PlacekeyRails::BatchProcessor).to receive(:process) do
         [{ id: 1, name: "Retry Test", success: true, placekey: "@37--122-xyz" }]
       end
       
-      location = Location.create!(
+      location = create_test_location(
         name: "Retry Test",
         latitude: 37.7749,
         longitude: -122.4194
