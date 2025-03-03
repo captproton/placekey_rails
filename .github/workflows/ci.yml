@@ -18,7 +18,40 @@ jobs:
           ruby-version: ruby-3.2.2
           bundler-cache: true
 
+      - name: Update bundle platforms
+        run: bundle lock --add-platform x86_64-linux
+
       - name: Lint code for consistent style
         run: bin/rubocop -f github
 
-
+  test:
+    runs-on: ubuntu-latest
+    strategy:
+      matrix:
+        ruby-version: ['3.2.2']
+    
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+      
+      - name: Install system dependencies
+        run: |
+          sudo apt-get update
+          sudo apt-get install -y cmake
+      
+      - name: Set up Ruby
+        uses: ruby/setup-ruby@v1
+        with:
+          ruby-version: ${{ matrix.ruby-version }}
+          bundler-cache: true # runs 'bundle install' and caches installed gems automatically
+      
+      - name: Update bundle platforms
+        run: bundle lock --add-platform x86_64-linux
+      
+      - name: Set up test database
+        run: |
+          cd spec/dummy
+          bin/rails db:create db:schema:load RAILS_ENV=test
+      
+      - name: Run tests
+        run: bundle exec rspec

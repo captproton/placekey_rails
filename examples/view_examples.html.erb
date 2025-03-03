@@ -1,0 +1,283 @@
+<%# Example views for locations using PlacekeyRails helpers %>
+
+<%# _form.html.erb - Form with coordinate fields %>
+<%= form_with(model: location) do |form| %>
+  <div class="field">
+    <%= form.label :name %>
+    <%= form.text_field :name %>
+  </div>
+
+  <div class="field">
+    <%= form.label :description %>
+    <%= form.text_area :description %>
+  </div>
+
+  <h3>Coordinates</h3>
+  <%= placekey_coordinate_fields(form, 
+        auto_generate: true, 
+        preview: true,
+        help: "Enter coordinates to generate a Placekey automatically" ) %>
+
+  <div class="actions">
+    <%= form.submit %>
+  </div>
+<% end %>
+
+<%# _address_form.html.erb - Form with address fields %>
+<%= form_with(model: location) do |form| %>
+  <div class="field">
+    <%= form.label :name %>
+    <%= form.text_field :name %>
+  </div>
+
+  <div class="field">
+    <%= form.label :description %>
+    <%= form.text_area :description %>
+  </div>
+
+  <h3>Address</h3>
+  <%= placekey_address_fields(form, 
+        compact_layout: true,
+        preview: true,
+        lookup_button: true,
+        address_label: "Street Address",
+        postal_code_label: "ZIP Code",
+        country_label: "Country Code (2-letter)" ) %>
+
+  <div class="actions">
+    <%= form.submit %>
+  </div>
+<% end %>
+
+<%# show.html.erb - Display a location with placekey info %>
+<h1><%= @location.name %></h1>
+
+<p><%= @location.description %></p>
+
+<% if @location.placekey.present? %>
+  <h3>Location Information</h3>
+  
+  <div class="placekey-info">
+    <p><strong>Placekey:</strong> <%= format_placekey(@location.placekey) %></p>
+    
+    <% if @location.coordinates_available? %>
+      <p>
+        <strong>Coordinates:</strong> 
+        <%= @location.latitude %>, <%= @location.longitude %>
+      </p>
+    <% end %>
+    
+    <%= placekey_card(@location.placekey, 
+          title: "Location Map",
+          show_coords: true) do %>
+      <div class="map-links">
+        <%= external_map_link_for_placekey(@location.placekey, 
+              :google_maps, "View on Google Maps") %> |
+        <%= external_map_link_for_placekey(@location.placekey, 
+              :openstreetmap, "View on OpenStreetMap") %>
+      </div>
+    <% end %>
+  </div>
+<% end %>
+
+<%# nearby.html.erb - Display nearby locations %>
+<h1>Locations near <%= @location.name %></h1>
+
+<div class="row">
+  <div class="col-md-4">
+    <h3>Origin Location</h3>
+    <%= placekey_card(@location.placekey, title: @location.name) %>
+  </div>
+  
+  <div class="col-md-8">
+    <h3>Nearby Locations (<%= @nearby_locations.size %>)</h3>
+    
+    <% if @nearby_locations.any? %>
+      <div class="nearby-list">
+        <% @nearby_locations.each do |nearby| %>
+          <div class="nearby-item">
+            <h4><%= link_to nearby.name, nearby %></h4>
+            <p>
+              Distance: 
+              <%= format_placekey_distance(@location.distance_to_location(nearby)) %>
+            </p>
+          </div>
+        <% end %>
+      </div>
+    <% else %>
+      <p>No nearby locations found within the specified distance.</p>
+    <% end %>
+  </div>
+</div>
+
+<%# map.html.erb - Interactive map with multiple locations %>
+<h1>Location Map</h1>
+
+<div class="map-controls">
+  <div class="form-group">
+    <label for="distance">Search Radius (meters):</label>
+    <input type="number" id="distance" class="form-control" value="1000" min="100" max="10000" step="100">
+  </div>
+  
+  <button id="search-btn" class="btn btn-primary">Search This Area</button>
+</div>
+
+<div id="locations-map" style="height: 600px; width: 100%;" 
+     data-controller="locations-map"
+     data-locations-map-geojson-value='<%= @geojson.to_json %>'
+     data-locations-map-center-value='<%= @center.to_json if @center %>'>
+</div>
+
+<script>
+  // Example Stimulus controller for the map
+  // app/javascript/controllers/locations_map_controller.js
+  import { Controller } from "@hotwired/stimulus"
+  
+  export default class extends Controller {
+    static values = {
+      geojson: Object,
+      center: Object
+    }
+    
+    connect() {
+      this.initializeMap()
+    }
+    
+    initializeMap() {
+      // Initialize a Leaflet map
+      this.map = L.map(this.element).setView([37.7371, -122.44283], 12)
+      
+      // Add tile layer
+      L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
+        attribution: '&copy; OpenStreetMap contributors'
+      }).addTo(this.map)
+      
+      // Add GeoJSON data
+      if (this.hasGeojsonValue) {
+        this.addLocations(this.geojsonValue)
+      }
+      
+      // Set center if provided
+      if (this.hasCenterValue) {
+        this.map.setView([this.centerValue.lat, this.centerValue.lng], 15)
+      }
+      
+      // Add event listeners for the search button
+      const searchBtn = document.getElementById('search-btn')
+      if (searchBtn) {
+        searchBtn.addEventListener('click', this.searchThisArea.bind(this))
+      }
+    }
+    
+    addLocations(geojson) {
+      this.locationsLayer = L.geoJSON(geojson, {
+        onEachFeature: (feature, layer) => {
+          if (feature.properties) {
+            layer.bindPopup(`
+              <h4>${feature.properties.name}</h4>
+              <p>Placekey: ${feature.properties.placekey}</p>
+              <p><a href="/locations/${feature.properties.id}">View Details</a></p>
+            `)
+          }
+        },
+        style: {
+          color: '#3388ff',
+          weight: 2,
+          opacity: 0.7,
+          fillOpacity: 0.3
+        }
+      }).addTo(this.map)
+      
+      // Fit bounds to show all locations
+      if (this.locationsLayer.getBounds().isValid()) {
+        this.map.fitBounds(this.locationsLayer.getBounds())
+      }
+    }
+    
+    searchThisArea() {
+      const bounds = this.map.getBounds()
+      const distance = document.getElementById('distance').value || 1000
+      
+      // Get the bbox as [south, west, north, east]
+      const bbox = [
+        bounds.getSouth(),
+        bounds.getWest(),
+        bounds.getNorth(),
+        bounds.getEast()
+      ].join(',')
+      
+      // Redirect to the map page with bounds parameter
+      window.location.href = `/locations/map?bounds=${bbox}&distance=${distance}`
+    }
+  }
+</script>
+
+<%# search.html.erb - Search locations by address %>
+<h1>Search Locations</h1>
+
+<div class="search-form">
+  <%= form_with(url: search_locations_path, method: :get, local: true) do |form| %>
+    <div class="field">
+      <%= form.label :address %>
+      <%= form.text_field :address, class: 'form-control' %>
+    </div>
+    
+    <div class="field">
+      <%= form.label :city %>
+      <%= form.text_field :city, class: 'form-control' %>
+    </div>
+    
+    <div class="field">
+      <%= form.label :region %>
+      <%= form.text_field :region, class: 'form-control' %>
+    </div>
+    
+    <div class="field">
+      <%= form.label :postal_code %>
+      <%= form.text_field :postal_code, class: 'form-control' %>
+    </div>
+    
+    <div class="actions">
+      <%= form.submit "Search", class: 'btn btn-primary' %>
+    </div>
+  <% end %>
+</div>
+
+<% if @results.any? %>
+  <div class="search-results">
+    <h2>Search Results (<%= @results.size %>)</h2>
+    
+    <ul class="results-list">
+      <% @results.each do |location| %>
+        <li class="result-item">
+          <h3><%= link_to location.name, location %></h3>
+          <p><%= location.description %></p>
+          <p>
+            <% if location.placekey == @query_placekey %>
+              <span class="badge bg-success">Exact Match</span>
+            <% else %>
+              <span class="badge bg-info">
+                <%= format_placekey_distance(location.distance_to(@query_placekey)) %> away
+              </span>
+            <% end %>
+          </p>
+        </li>
+      <% end %>
+    </ul>
+  </div>
+<% elsif params[:address].present? %>
+  <div class="no-results">
+    <p>No locations found matching that address.</p>
+    
+    <p>
+      <%= link_to "Create a new location with this address", 
+            new_location_path(
+              address: params[:address], 
+              city: params[:city], 
+              region: params[:region], 
+              postal_code: params[:postal_code]
+            ), 
+            class: 'btn btn-secondary' %>
+    </p>
+  </div>
+<% end %>
