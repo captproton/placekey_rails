@@ -32,7 +32,7 @@ Gem::Specification.new do |spec|
 
   spec.requirements << 'cmake'
   spec.requirements << 'h3'
-  spec.required_ruby_version = '>= 3.4.1'
+  spec.required_ruby_version = '>= 3.2.0'
 
   spec.add_development_dependency 'rspec-rails'
   spec.add_development_dependency 'capybara'
