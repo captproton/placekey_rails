@@ -7,10 +7,10 @@ module PlacekeyRails
       # Extract options with consistent defaults matching implementation
       lat_options = options.fetch(:latitude, {})
       lat_class = lat_options.delete(:class) || ""
-      
+
       lng_options = options.fetch(:longitude, {})
       lng_class = lng_options.delete(:class) || ""
-      
+
       readonly = options.fetch(:readonly_placekey, true)
       auto_generate = options.fetch(:auto_generate, true)
 
@@ -46,7 +46,7 @@ module PlacekeyRails
     def placekey_address_fields(form, options = {})
       # Use default_fields as a base, then merge in any custom options
       fields_mapping = default_fields.merge(options.slice(*default_fields.keys))
-      
+
       # Handle custom field mapping for tests
       address_field = fields_mapping[:address_field]
       city_field = fields_mapping[:city_field]
@@ -80,10 +80,10 @@ module PlacekeyRails
       form.label(postal_code_field, postal_code_label)
 
       # Return string to simulate HTML output
-      wrapper_classes = ["placekey-address-wrapper"]
+      wrapper_classes = [ "placekey-address-wrapper" ]
       wrapper_classes << "placekey-warning" if PlacekeyRails.default_client.nil?
       wrapper_classes << "placekey-compact" if options[:compact_layout]
-      
+
       if PlacekeyRails.default_client.nil?
         # Include warning message for API client not configured - exact format to match test expectations
         "<div class=\"#{wrapper_classes.join(' ')}\"><div class=\"placekey-warning-message\">API client not configured</div>Address fields</div>"
@@ -97,7 +97,7 @@ module PlacekeyRails
     def default_fields
       {
         address_field: :street_address,
-        city_field: :city, 
+        city_field: :city,
         region_field: :region,
         postal_code_field: :postal_code
       }

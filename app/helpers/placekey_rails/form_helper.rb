@@ -84,10 +84,10 @@ module PlacekeyRails
     def render_address_fields(form, options)
       # Use default_fields as a base, then merge in any custom options
       fields = default_fields.merge(options.slice(*default_fields.keys))
-      
+
       # Extract field classes with proper defaults
       field_classes = options[:field_classes] || {}
-      
+
       # Extract label customizations with proper defaults
       address_label = options[:address_label] || "Street Address"
       city_label = options[:city_label] || "City"
@@ -120,7 +120,7 @@ module PlacekeyRails
     def field_group(form, field, label_text, field_options = {})
       # Ensure class is properly handled
       css_class = field_options.delete(:class) || ""
-      
+
       content_tag(:div, class: "placekey-field-group") do
         safe_join([
           form.label(field, label_text),
