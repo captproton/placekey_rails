@@ -1,0 +1,54 @@
+<p id="notice"><%= notice %></p>
+
+<h1><%= @location.name %></h1>
+
+<div class="location-details">
+  <div class="coordinates">
+    <p>
+      <strong>Latitude:</strong>
+      <%= @location.latitude %>
+    </p>
+
+    <p>
+      <strong>Longitude:</strong>
+      <%= @location.longitude %>
+    </p>
+  </div>
+
+  <div class="placekey-info">
+    <p>
+      <strong>Placekey:</strong>
+      <%= placekey_display(@location) %>
+    </p>
+  </div>
+
+  <div class="address-info">
+    <% if @location.street_address.present? %>
+      <p>
+        <strong>Address:</strong>
+        <%= @location.street_address %>, 
+        <%= @location.city %>, 
+        <%= @location.region %> 
+        <%= @location.postal_code %>
+      </p>
+    <% end %>
+  </div>
+</div>
+
+<!-- Placekey Map Display -->
+<div class="placekey-map-container" style="height: 400px; margin-top: 20px;">
+  <%= placekey_map(@location, height: "100%") %>
+</div>
+
+<!-- Placekey Neighbors -->
+<div class="neighbors-container">
+  <h3>Neighboring Placekeys</h3>
+  <ul>
+    <% @location.neighboring_placekeys.each do |pk| %>
+      <li><%= pk %></li>
+    <% end %>
+  </ul>
+</div>
+
+<%= link_to 'Edit', edit_location_path(@location) %> |
+<%= link_to 'Back', locations_path %>

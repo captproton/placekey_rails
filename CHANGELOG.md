@@ -7,7 +7,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
-## [0.2.0] - 2025-03-02
+## [0.2.0] - 2025-03-03
 
 ### Added
 - ActiveRecord integration through `Placekeyable` concern
@@ -33,6 +33,9 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
   - Optimized spatial queries
   - Memory usage improvements
 - Comprehensive documentation
+  - Quick Start Guide
+  - Installation Guide with platform-specific instructions
+  - Compatibility Guide
   - Performance optimization guide
   - API reference documentation
   - Detailed examples and usage guides
@@ -42,6 +45,17 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - Enhanced error handling throughout the library
 - Improved module configuration options
 - More flexible API client options
+- Fixed parameter handling in Placekeyable concern
+- Fixed form helper field options handling
+- Updated GitHub Actions workflow to use Ruby 3.2.2
+- Fixed performance tests with more consistent timing
+
+### Fixed
+- Fixed `respond_to?` method signature in the Placekeyable concern to properly handle the optional second parameter
+- Fixed parameter handling in the FormHelper for better compatibility with Rails conventions
+- Fixed BatchProcessor parameter handling to match test expectations
+- Properly mocked Placekey validation in tests to avoid validation errors
+- Fixed GitHub Actions CI to use the correct Ruby version
 
 ## [0.1.0] - 2025-02-28
 

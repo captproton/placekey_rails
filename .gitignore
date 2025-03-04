@@ -1,10 +1,86 @@
+# Ignore bundler config and gems
 /.bundle/
-/doc/
-/log/*.log
+/vendor/bundle
+/lib/bundler/man/
+
+# Ignore all logfiles and tempfiles
+/log/*
+/tmp/*
+!/log/.keep
+!/tmp/.keep
+
+# Ignore pidfiles
+/tmp/pids/*
+!/tmp/pids/
+!/tmp/pids/.keep
+
+# Ignore uploaded files in development
+/storage/*
+!/storage/.keep
+/tmp/storage/*
+!/tmp/storage/
+!/tmp/storage/.keep
+
+# Ignore master key for decrypting credentials
+/config/master.key
+
+# Ignore database configuration
+/config/database.yml
+
+# Ignore test coverage reports
+/coverage/
+
+# Ignore precompiled assets
+/public/assets
+/public/packs
+/public/packs-test
+/node_modules
+/yarn-error.log
+yarn-debug.log*
+.yarn-integrity
+
+# Ignore macOS system files
+.DS_Store
+.AppleDouble
+.LSOverride
+
+# Ignore RVM and rbenv files
+.rvmrc
+.rbenv-vars
+.ruby-gemset
+.tool-versions      # asdf version manager file
+
+# Ignore environment files
+.env
+.env.*
+
+# Ignore IDE specific files
+/.idea
+/.vscode
+*.swp
+*.swo
+
+# Ignore gem specific files
+*.gem
 /pkg/
-/tmp/
+/spec/reports/
+/spec/examples.txt
+/test/tmp/
+/test/version_tmp/
 /spec/dummy/db/*.sqlite3
 /spec/dummy/db/*.sqlite3-*
 /spec/dummy/log/*.log
 /spec/dummy/storage/
 /spec/dummy/tmp/
+
+# Ignore asset pipeline cache
+/spec/dummy/app/assets/builds/*
+!/spec/dummy/app/assets/builds/.keep
+
+# Ignore yarn files
+/spec/dummy/yarn.lock
+/spec/dummy/node_modules/
+
+# Ignore compiled JavaScript
+/app/assets/builds/*
+!/app/assets/builds/.keep
