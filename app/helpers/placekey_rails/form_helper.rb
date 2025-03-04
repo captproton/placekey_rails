@@ -37,14 +37,17 @@ module PlacekeyRails
     # @param form [FormBuilder] The form builder instance
     # @param options [Hash] Additional options for the fields
     def placekey_coordinate_fields(form, options = {})
+      # Extract options with proper defaults
       latitude_options = options[:latitude] || {}
       longitude_options = options[:longitude] || {}
+      readonly_placekey = options.fetch(:readonly_placekey, true)
+      auto_generate = options.fetch(:auto_generate, true)
 
       content_tag(:div, class: "placekey-coordinate-fields") do
         placekey_options = {
           class: "placekey-field",
-          readonly: options.fetch(:readonly_placekey, true),
-          data: { auto_generate: options.fetch(:auto_generate, true) }
+          readonly: readonly_placekey,
+          data: { auto_generate: auto_generate }
         }
 
         safe_join([
@@ -79,10 +82,13 @@ module PlacekeyRails
     end
 
     def render_address_fields(form, options)
+      # Use default_fields as a base, then merge in any custom options
       fields = default_fields.merge(options.slice(*default_fields.keys))
+      
+      # Extract field classes with proper defaults
       field_classes = options[:field_classes] || {}
-
-      # Extract label customizations
+      
+      # Extract label customizations with proper defaults
       address_label = options[:address_label] || "Street Address"
       city_label = options[:city_label] || "City"
       region_label = options[:region_label] || "Region"
@@ -112,12 +118,13 @@ module PlacekeyRails
     end
 
     def field_group(form, field, label_text, field_options = {})
-      field_class = field_options.delete(:class) || ""
-
+      # Ensure class is properly handled
+      css_class = field_options.delete(:class) || ""
+      
       content_tag(:div, class: "placekey-field-group") do
         safe_join([
           form.label(field, label_text),
-          form.text_field(field, field_options.merge(class: field_class))
+          form.text_field(field, field_options.merge(class: css_class))
         ])
       end
     end

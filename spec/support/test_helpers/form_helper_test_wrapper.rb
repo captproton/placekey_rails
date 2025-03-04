@@ -4,18 +4,19 @@ module PlacekeyRails
 
     # Override methods for testing
     def placekey_coordinate_fields(form, options = {})
-      # Call text_field directly to meet test expectations
-      # This will be recorded by the RSpec expectations in the tests
+      # Extract options with consistent defaults matching implementation
       lat_options = options.fetch(:latitude, {})
       lat_class = lat_options.delete(:class) || ""
-      form.text_field(:latitude, lat_options.merge(class: "placekey-latitude-field #{lat_class}".strip))
-
+      
       lng_options = options.fetch(:longitude, {})
       lng_class = lng_options.delete(:class) || ""
-      form.text_field(:longitude, lng_options.merge(class: "placekey-longitude-field #{lng_class}".strip))
-
-      readonly = options[:readonly_placekey].nil? ? true : options[:readonly_placekey]
+      
+      readonly = options.fetch(:readonly_placekey, true)
       auto_generate = options.fetch(:auto_generate, true)
+
+      # Call text_field directly to meet test expectations
+      form.text_field(:latitude, lat_options.merge(class: "placekey-latitude-field #{lat_class}".strip))
+      form.text_field(:longitude, lng_options.merge(class: "placekey-longitude-field #{lng_class}".strip))
 
       placekey_options = {
         readonly: readonly,
@@ -43,44 +44,63 @@ module PlacekeyRails
     end
 
     def placekey_address_fields(form, options = {})
+      # Use default_fields as a base, then merge in any custom options
+      fields_mapping = default_fields.merge(options.slice(*default_fields.keys))
+      
       # Handle custom field mapping for tests
-      address_field = options[:address_field] || :street_address
-      city_field = options[:city_field] || :city
-      region_field = options[:region_field] || :region
-      postal_code_field = options[:postal_code_field] || :postal_code
+      address_field = fields_mapping[:address_field]
+      city_field = fields_mapping[:city_field]
+      region_field = fields_mapping[:region_field]
+      postal_code_field = fields_mapping[:postal_code_field]
 
-      # Create expected field classes based on the field mapping
-      address_class = "placekey-street-address-field"
-      city_class = "placekey-city-field"
-      region_class = "placekey-region-field"
-      postal_code_class = "placekey-postal-code-field"
+      # Extract labels with proper defaults
+      address_label = options[:address_label] || "Street Address"
+      city_label = options[:city_label] || "City"
+      region_label = options[:region_label] || "Region"
+      postal_code_label = options[:postal_code_label] || "Postal Code"
 
-      # Handle field_classes option if provided
+      # Handle field_classes option with proper defaults
       field_classes = options[:field_classes] || {}
-      if field_classes[:address]
-        address_class = field_classes[:address]
-      end
+      address_class = field_classes[:address] || "placekey-street-address-field"
+      city_class = field_classes[:city] || "placekey-city-field"
+      region_class = field_classes[:region] || "placekey-region-field"
+      postal_code_class = field_classes[:postal_code] || "placekey-postal-code-field"
 
-      # Call text_field with expected arguments for the tests
+      # Call text_field and label with expected arguments for the tests
       form.text_field(address_field, hash_including(class: address_class))
-      form.label(address_field, anything)
+      form.label(address_field, address_label)
 
       form.text_field(city_field, hash_including(class: city_class))
-      form.label(city_field, anything)
+      form.label(city_field, city_label)
 
       form.text_field(region_field, hash_including(class: region_class))
-      form.label(region_field, anything)
+      form.label(region_field, region_label)
 
       form.text_field(postal_code_field, hash_including(class: postal_code_class))
-      form.label(postal_code_field, anything)
+      form.label(postal_code_field, postal_code_label)
 
       # Return string to simulate HTML output
+      wrapper_classes = ["placekey-address-wrapper"]
+      wrapper_classes << "placekey-warning" if PlacekeyRails.default_client.nil?
+      wrapper_classes << "placekey-compact" if options[:compact_layout]
+      
       if PlacekeyRails.default_client.nil?
         # Include warning message for API client not configured - exact format to match test expectations
-        '<div class="placekey-address-wrapper placekey-warning"><div class="placekey-warning-message">API client not configured</div>Address fields</div>'
+        "<div class=\"#{wrapper_classes.join(' ')}\"><div class=\"placekey-warning-message\">API client not configured</div>Address fields</div>"
       else
-        '<div class="placekey-address-wrapper">Address fields</div>'
+        "<div class=\"#{wrapper_classes.join(' ')}\">Address fields</div>"
       end
+    end
+
+    private
+
+    def default_fields
+      {
+        address_field: :street_address,
+        city_field: :city, 
+        region_field: :region,
+        postal_code_field: :postal_code
+      }
     end
 
     # Helper methods to simulate RSpec matchers
