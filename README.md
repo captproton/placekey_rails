@@ -5,13 +5,11 @@
 
 A Ruby on Rails engine for working with [Placekeys](https://placekey.io/) - a universal standard identifier for physical places.
 
-## ⚠️ Development Status
+## Development Status
 
-**Note:** This gem is currently in active development and not yet ready for production use. 
-Some components are stable while others are still being refined.
+This gem is at version 0.2.0 and includes comprehensive Rails integration features. All core functionality is stable and tests are passing.
 
-See [DEVELOPMENT_STATUS.md](DEVELOPMENT_STATUS.md) for detailed information on the 
-current development status and known issues.
+See [DEVELOPMENT_STATUS.md](DEVELOPMENT_STATUS.md) for detailed information on the current development status.
 
 ## What is Placekey?
 
@@ -39,12 +37,16 @@ Example: `227@5vg-82n-kzz` where `227` is the "what" and `@5vg-82n-kzz` is the "
 - JavaScript components for interactive Placekey maps and forms
 - Built-in caching and batch processing for performance optimization
 
+## Quick Start
+
+See our [Quick Start Guide](docs/QUICK_START.md) to get up and running with PlacekeyRails.
+
 ## Installation
 
 Add this line to your application's Gemfile:
 
 ```ruby
-gem 'placekey_rails', '~> 0.1.0'
+gem 'placekey_rails', '~> 0.2.0'
 ```
 
 And then execute:
@@ -59,6 +61,8 @@ Or install it yourself as:
 $ gem install placekey_rails
 ```
 
+For detailed installation instructions, including platform-specific setups, see our [Installation Guide](docs/INSTALLATION.md).
+
 ## Requirements
 
 The gem requires:
@@ -67,27 +71,7 @@ The gem requires:
 - CMake (for H3 installation)
 - H3 library
 
-### Installing System Dependencies
-
-#### macOS
-
-```bash
-brew install cmake
-brew install h3
-```
-
-#### Ubuntu/Debian
-
-```bash
-sudo apt-get update
-sudo apt-get install cmake
-# H3 requires manual installation from source
-git clone https://github.com/uber/h3.git
-cd h3
-cmake -DCMAKE_BUILD_TYPE=Release -DBUILD_SHARED_LIBS=ON .
-make
-sudo make install
-```
+See our [Compatibility Guide](docs/COMPATIBILITY.md) for information on supported environments.
 
 ## Basic Usage
 
@@ -204,6 +188,8 @@ within_area = Location.within_geojson(geojson_data)
 Location.batch_geocode_addresses
 ```
 
+For detailed information on ActiveRecord integration, see [ActiveRecord Integration](docs/ACTIVERECORD_INTEGRATION.md).
+
 ## View Helpers
 
 Use the included helpers to display Placekeys in your views:
@@ -225,6 +211,8 @@ Use the included helpers to display Placekeys in your views:
 <% end %>
 ```
 
+For a complete list of available helpers, see [View Helpers](docs/VIEW_HELPERS.md).
+
 ## JavaScript Components
 
 The gem includes Stimulus.js controllers for interactive Placekey functionality:
@@ -240,6 +228,8 @@ Simply include the JavaScript in your application:
 // app/javascript/application.js
 import "placekey_rails"
 ```
+
+For detailed information on JavaScript components, see [JavaScript Components](docs/JAVASCRIPT_COMPONENTS.md).
 
 ## Performance Optimization
 
@@ -273,6 +263,8 @@ For more performance tips, see the [Performance Optimization Guide](docs/PERFORM
 
 For detailed documentation, please see:
 
+- [Quick Start Guide](docs/QUICK_START.md) - Get up and running quickly
+- [Installation Guide](docs/INSTALLATION.md) - Detailed platform-specific installation instructions
 - [API Reference](docs/API_REFERENCE.md) - Complete reference for all gem methods
 - [Examples](docs/EXAMPLES.md) - Detailed examples of using the gem
 - [ActiveRecord Integration](docs/ACTIVERECORD_INTEGRATION.md) - Using with models
@@ -280,6 +272,7 @@ For detailed documentation, please see:
 - [JavaScript Components](docs/JAVASCRIPT_COMPONENTS.md) - Using the JS components
 - [Performance Optimization](docs/PERFORMANCE.md) - Tips for optimizing performance
 - [Troubleshooting](docs/TROUBLESHOOTING.md) - Solutions for common issues
+- [Compatibility Guide](docs/COMPATIBILITY.md) - Information on supported environments
 
 ## Development
 
