@@ -2,10 +2,10 @@ require_relative './lib/placekey_rails/validator'
 
 # Test cases
 test_cases = [
-  ["@5vg-82n-kzz", "@5vg-82n-kzz"],
-  ["23b@5vg-82n-kzz", "@5vg-82n-kzz"],
-  ["223227@5vg-82n-kzz", "223-227@5vg-82n-kzz"],
-  ["223@5vg-82n-kzz", "223-@5vg-82n-kzz"]
+  [ "@5vg-82n-kzz", "@5vg-82n-kzz" ],
+  [ "23b@5vg-82n-kzz", "@5vg-82n-kzz" ],
+  [ "223227@5vg-82n-kzz", "223-227@5vg-82n-kzz" ],
+  [ "223@5vg-82n-kzz", "223-@5vg-82n-kzz" ]
 ]
 
 # Run the tests

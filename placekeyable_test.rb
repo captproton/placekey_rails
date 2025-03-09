@@ -14,22 +14,22 @@ require_relative 'lib/placekey_rails/validator'
 class TestClass
   # Storage for attributes
   attr_reader :attributes
-  
+
   def initialize
     @attributes = {}
   end
-  
+
   # Mimic ActiveRecord's attribute writer
   def write_attribute(name, value)
     @attributes[name.to_s] = value
   end
-  
+
   # Add the setter we're testing
   def placekey=(value)
     normalized_value = PlacekeyRails::Validator.normalize_placekey_format(value)
     write_attribute(:placekey, normalized_value)
   end
-  
+
   # Add a reader method
   def placekey
     @attributes["placekey"]
