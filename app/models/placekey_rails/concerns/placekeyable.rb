@@ -12,6 +12,14 @@ module PlacekeyRails
 
         scope :with_placekey, -> { where.not(placekey: [ nil, "" ]) }
       end
+      
+      # Override the placekey= setter to normalize the placekey before assignment
+      # This ensures that placekeys from various sources (especially the API) are 
+      # automatically normalized to the standard format
+      def placekey=(value)
+        normalized_value = PlacekeyRails::Validator.normalize_placekey_format(value)
+        write_attribute(:placekey, normalized_value)
+      end
 
       # Check if coordinates are available to generate placekey
       def coordinates_available?
