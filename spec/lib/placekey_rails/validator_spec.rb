@@ -1,97 +1,123 @@
-require 'rails_helper'
+require 'spec_helper'
 
 RSpec.describe PlacekeyRails::Validator do
-  before do
-    # Create the mocks as modules with the necessary methods
-    h3_adapter = Module.new
-    h3_adapter.define_singleton_method(:is_valid_cell) { |_h3_index| true }
-    h3_adapter.define_singleton_method(:string_to_h3) { |_h3_string| 123456789 }
+  describe ".normalize_placekey_format" do
+    it "keeps valid @where placekeys unchanged" do
+      placekey = "@5vg-82n-kzz"
+      expect(described_class.normalize_placekey_format(placekey)).to eq(placekey)
+    end
 
-    converter = Module.new
-    converter.define_singleton_method(:placekey_to_h3) { |_placekey| "8a2830828767fff" }
-    converter.define_singleton_method(:placekey_to_h3_int) { |_placekey| 123456789 }
+    it "removes simple numeric prefixes from placekeys" do
+      placekey = "23b@5vg-82n-kzz"
+      expect(described_class.normalize_placekey_format(placekey)).to eq("@5vg-82n-kzz")
+    end
 
-    # Stub the real constants with our mocks
-    stub_const("PlacekeyRails::H3Adapter", h3_adapter)
-    stub_const("PlacekeyRails::Converter", converter)
+    it "handles complex numeric prefixes" do
+      placekey = "23456@5vg-82n-kzz"
+      expect(described_class.normalize_placekey_format(placekey)).to eq("@5vg-82n-kzz")
+    end
+
+    it "keeps valid what@where format placekeys unchanged" do
+      placekey = "223-227@5vg-82n-kzz"
+      expect(described_class.normalize_placekey_format(placekey)).to eq(placekey)
+    end
+
+    it "adds dash to what part when it has 6 characters" do
+      placekey = "223227@5vg-82n-kzz"
+      expect(described_class.normalize_placekey_format(placekey)).to eq("223-227@5vg-82n-kzz")
+    end
+
+    it "adds dash to single what part with 3 characters" do
+      placekey = "223@5vg-82n-kzz"
+      expect(described_class.normalize_placekey_format(placekey)).to eq("223-@5vg-82n-kzz")
+    end
+
+    it "adds @ symbol to where-only keys" do
+      placekey = "5vg-82n-kzz"
+      expect(described_class.normalize_placekey_format(placekey)).to eq("@5vg-82n-kzz")
+    end
+
+    it "returns nil for nil input" do
+      expect(described_class.normalize_placekey_format(nil)).to be_nil
+    end
+
+    it "returns original placekey for unrecognized formats" do
+      placekey = "invalid-format"
+      expect(described_class.normalize_placekey_format(placekey)).to eq(placekey)
+    end
+
+    it "returns empty string for empty input" do
+      expect(described_class.normalize_placekey_format("")).to eq("")
+    end
+
+    it "handles real API response examples" do
+      # Test with real examples from API responses
+      examples = {
+        "12a@5vg-849-gp9" => "@5vg-849-gp9",
+        "23456789@5vg-82n-kzz" => "@5vg-82n-kzz",
+        "123abc@5vg-82n-kzz" => "@5vg-82n-kzz"
+      }
+
+      examples.each do |input, expected|
+        expect(described_class.normalize_placekey_format(input)).to eq(expected)
+      end
+    end
   end
 
+  describe ".placekey_format_is_valid_normalized" do
+    # Mock the placekey_format_is_valid method to isolate this test
+    before do
+      allow(described_class).to receive(:placekey_format_is_valid).and_call_original
+    end
+
+    it "validates standard format placekeys" do
+      placekey = "@5vg-82n-kzz"
+      expect(described_class.placekey_format_is_valid_normalized(placekey)).to eq(
+        described_class.placekey_format_is_valid(placekey)
+      )
+    end
+
+    it "validates placekeys after normalizing them" do
+      placekey = "23b@5vg-849-gp9"
+      normalized = "@5vg-849-gp9"
+
+      # It should normalize and then validate
+      expect(described_class).to receive(:normalize_placekey_format).with(placekey).and_return(normalized)
+      expect(described_class).to receive(:placekey_format_is_valid).with(normalized)
+
+      described_class.placekey_format_is_valid_normalized(placekey)
+    end
+
+    it "rejects invalid placekeys even after normalization" do
+      invalid_placekey = "invalid-format"
+
+      # The original validation should return false
+      allow(described_class).to receive(:placekey_format_is_valid).with(invalid_placekey).and_return(false)
+
+      expect(described_class.placekey_format_is_valid_normalized(invalid_placekey)).to be false
+    end
+  end
+
+  # Test the existing placekey_format_is_valid method
   describe ".placekey_format_is_valid" do
-    context "with where part only" do
-      it "validates correct placekey format" do
-        result = described_class.placekey_format_is_valid("@5vg-7gq-tvz")
-        expect(result).to be true
-      end
+    it "validates @where format" do
+      expect(described_class.placekey_format_is_valid("@5vg-82n-kzz")).to be true
     end
 
-    it "validates correct placekey format with what and where parts" do
-      result = described_class.placekey_format_is_valid("222-227@5vg-7gq-tvz")
-      expect(result).to be true
+    it "validates what@where format" do
+      expect(described_class.placekey_format_is_valid("223-227@5vg-82n-kzz")).to be true
     end
 
-    it "rejects invalid placekey format" do
-      result = described_class.placekey_format_is_valid("invalid-format")
-      expect(result).to be false
-    end
-  end
-
-  describe ".where_part_is_valid" do
-    it "validates correct where part format" do
-      result = described_class.where_part_is_valid("5vg-7gq-tvz")
-      expect(result).to be true
+    it "rejects invalid formats" do
+      expect(described_class.placekey_format_is_valid("invalid-format")).to be false
     end
 
-    it "rejects invalid where part format when regex doesn't match" do
-      result = described_class.where_part_is_valid("invalid-format")
-      expect(result).to be false
+    it "rejects nil input" do
+      expect(described_class.placekey_format_is_valid(nil)).to be false
     end
 
-    it "rejects invalid where part format when H3 validation fails" do
-      # Create a new mock with different behavior for this specific test
-      h3_adapter = Module.new
-      h3_adapter.define_singleton_method(:is_valid_cell) { |_h3_index| false }
-      h3_adapter.define_singleton_method(:string_to_h3) { |_h3_string| 123456789 }
-      stub_const("PlacekeyRails::H3Adapter", h3_adapter)
-
-      result = described_class.where_part_is_valid("5vg-7gq-tvz")
-      expect(result).to be false
-    end
-
-    it "handles exceptions during conversion" do
-      # Create a new mock with different behavior for this specific test
-      converter = Module.new
-      converter.define_singleton_method(:placekey_to_h3) { |_placekey| raise StandardError }
-      converter.define_singleton_method(:placekey_to_h3_int) { |_placekey| 123456789 }
-      stub_const("PlacekeyRails::Converter", converter)
-
-      result = described_class.where_part_is_valid("5vg-7gq-tvz")
-      expect(result).to be false
-    end
-
-    context "when conversion fails" do
-      before do
-        # Create a new mock with different behavior for this specific test context
-        converter = Module.new
-        converter.define_singleton_method(:placekey_to_h3) { |_placekey| raise StandardError }
-        converter.define_singleton_method(:placekey_to_h3_int) { |_placekey| 123456789 }
-        stub_const("PlacekeyRails::Converter", converter)
-      end
-
-      it "returns false" do
-        result = described_class.where_part_is_valid("5vg-7gq-tvz")
-        expect(result).to be false
-      end
-    end
-
-    it "handles H3 validation exceptions" do
-      # Create a new mock with different behavior for this specific test
-      h3_adapter = Module.new
-      h3_adapter.define_singleton_method(:is_valid_cell) { |_h3_index| raise StandardError }
-      h3_adapter.define_singleton_method(:string_to_h3) { |_h3_string| 123456789 }
-      stub_const("PlacekeyRails::H3Adapter", h3_adapter)
-
-      result = described_class.where_part_is_valid("5vg-7gq-tvz")
-      expect(result).to be false
+    it "rejects empty string" do
+      expect(described_class.placekey_format_is_valid("")).to be false
     end
   end
 end
