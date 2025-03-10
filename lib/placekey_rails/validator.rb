@@ -11,10 +11,10 @@ module PlacekeyRails
     WHAT_REGEX_V1 = /^[23456789bcdfghjkmnpqrstvwxyz]{3,}-[23456789bcdfghjkmnpqrstvwxyz]{3,}$/
     WHAT_REGEX_V2 = /^[01][abcdefghijklmnopqrstuvwxyz234567]{9}$/
     PLACEKEY_REGEX = /^(@|[23456789bcdfghjkmnpqrstvwxyz]{3,}-[23456789bcdfghjkmnpqrstvwxyz]{3,}@)?[23456789bcdfghjkmnpqrstvwxyz]{3}-[23456789bcdfghjkmnpqrstvwxyz]{3}-[23456789bcdfghjkmnpqrstvwxyz]{3}$/
-    
+
     # Pattern for valid What parts (using Placekey alphabet characters)
     VALID_WHAT_PATTERN = /^[23456789bcdfghjkmnpqrstvwxyz]+$/
-    
+
     # Pattern for numeric prefixes from API that should be removed
     # This specifically excludes valid What parts like "223" or "223227"
     NUMERIC_PREFIX_PATTERN = /^(?:\d+[a-z]+|(?!223|223227)\d+)$/
@@ -84,12 +84,12 @@ module PlacekeyRails
     def normalize_placekey_format(placekey)
       return placekey unless placekey.is_a?(String)
       return placekey if placekey.blank?
-      
-      if placekey.include?('@')
-        parts = placekey.split('@', 2)
+
+      if placekey.include?("@")
+        parts = placekey.split("@", 2)
         what_part = parts[0]
         where_part = parts[1]
-        
+
         # Case 1: @where format (already correct)
         if what_part.empty?
           return placekey
@@ -100,14 +100,14 @@ module PlacekeyRails
           return "223-227@#{where_part}"
         elsif what_part == "223"
           return "223-@#{where_part}"
-          
-        # Case 2: Handle numeric prefixes from API responses 
+
+        # Case 2: Handle numeric prefixes from API responses
         # This handles patterns like "23b@", "123@", "123abc@" but NOT "223" or "223227"
         elsif what_part.match?(NUMERIC_PREFIX_PATTERN)
           return "@#{where_part}"
-        
+
         # Case 3: Check for other valid What part patterns that need formatting
-        elsif what_part.match?(VALID_WHAT_PATTERN) && !what_part.include?('-')
+        elsif what_part.match?(VALID_WHAT_PATTERN) && !what_part.include?("-")
           if what_part.length == 6
             # Format 6-char What parts as two triplets with a dash
             formatted_what = "#{what_part[0..2]}-#{what_part[3..5]}"
@@ -124,11 +124,11 @@ module PlacekeyRails
           return "@#{placekey}"
         end
       end
-      
+
       # Return original if we can't normalize it
       placekey
     end
-    
+
     # Validate a placekey after normalizing it
     # This is useful for validating placekeys that might come from the API
     # in non-standard formats
