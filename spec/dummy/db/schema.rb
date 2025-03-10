@@ -26,7 +26,7 @@ ActiveRecord::Schema[8.0].define(version: 2025_03_03_000001) do
     t.string "country", default: "US"
     t.datetime "created_at", null: false
     t.datetime "updated_at", null: false
-    t.index [ "latitude", "longitude" ], name: "index_locations_on_latitude_and_longitude"
-    t.index [ "placekey" ], name: "index_locations_on_placekey"
+    t.index ["latitude", "longitude"], name: "index_locations_on_latitude_and_longitude"
+    t.index ["placekey"], name: "index_locations_on_placekey"
   end
 end

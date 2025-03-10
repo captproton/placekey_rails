@@ -1,86 +1,44 @@
-# Ignore bundler config and gems
-/.bundle/
-/vendor/bundle
-/lib/bundler/man/
-
-# Ignore all logfiles and tempfiles
-/log/*
-/tmp/*
-!/log/.keep
-!/tmp/.keep
-
-# Ignore pidfiles
-/tmp/pids/*
-!/tmp/pids/
-!/tmp/pids/.keep
-
-# Ignore uploaded files in development
-/storage/*
-!/storage/.keep
-/tmp/storage/*
-!/tmp/storage/
-!/tmp/storage/.keep
-
-# Ignore master key for decrypting credentials
-/config/master.key
-
-# Ignore database configuration
-/config/database.yml
-
-# Ignore test coverage reports
-/coverage/
-
-# Ignore precompiled assets
-/public/assets
-/public/packs
-/public/packs-test
-/node_modules
-/yarn-error.log
-yarn-debug.log*
-.yarn-integrity
-
-# Ignore macOS system files
-.DS_Store
-.AppleDouble
-.LSOverride
-
-# Ignore RVM and rbenv files
-.rvmrc
-.rbenv-vars
-.ruby-gemset
-.tool-versions      # asdf version manager file
-
-# Ignore environment files
-.env
-.env.*
-
-# Ignore IDE specific files
-/.idea
-/.vscode
-*.swp
-*.swo
-
-# Ignore gem specific files
 *.gem
+*.rbc
+/.config
+/coverage/
+/InstalledFiles
 /pkg/
 /spec/reports/
 /spec/examples.txt
 /test/tmp/
 /test/version_tmp/
-/spec/dummy/db/*.sqlite3
-/spec/dummy/db/*.sqlite3-*
-/spec/dummy/log/*.log
-/spec/dummy/storage/
-/spec/dummy/tmp/
+/tmp/
 
-# Ignore asset pipeline cache
-/spec/dummy/app/assets/builds/*
-!/spec/dummy/app/assets/builds/.keep
+# Ignore all test verification scripts
+*_test.rb
+*_verification.rb
+verify_*.rb
 
-# Ignore yarn files
-/spec/dummy/yarn.lock
-/spec/dummy/node_modules/
+# rspec failure tracking
+.rspec_status
 
-# Ignore compiled JavaScript
-/app/assets/builds/*
-!/app/assets/builds/.keep
+# Used by dotenv library to load environment variables.
+# .env
+
+# Documentation
+/.yardoc/
+/_yardoc/
+/doc/
+/rdoc/
+
+# System-specific files
+.DS_Store
+
+# Environment normalization
+/.bundle/
+/vendor/bundle
+/lib/bundler/man/
+
+# Dummy app files
+spec/dummy/log/*.log
+spec/dummy/node_modules/
+spec/dummy/yarn-error.log
+spec/dummy/storage/
+spec/dummy/tmp/
+spec/dummy/public/assets
