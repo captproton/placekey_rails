@@ -12,8 +12,8 @@ module PlacekeyRails
     WHAT_REGEX_V2 = /^[01][abcdefghijklmnopqrstuvwxyz234567]{9}$/
     PLACEKEY_REGEX = /^(@|[23456789bcdfghjkmnpqrstvwxyz]{3,}-[23456789bcdfghjkmnpqrstvwxyz]{3,}@)?[23456789bcdfghjkmnpqrstvwxyz]{3}-[23456789bcdfghjkmnpqrstvwxyz]{3}-[23456789bcdfghjkmnpqrstvwxyz]{3}$/
     
-    # Regex for identifying valid What part patterns (6 chars or 3 chars)
-    VALID_WHAT_PATTERN = /^([23456789bcdfghjkmnpqrstvwxyz]{6}|[23456789bcdfghjkmnpqrstvwxyz]{3})$/
+    # Numeric prefix pattern that should be removed
+    NUMERIC_PREFIX_PATTERN = /^\d+[a-z]*$/
 
     def placekey_format_is_valid(placekey)
       begin
@@ -89,24 +89,24 @@ module PlacekeyRails
         # Case 1: @where format (already correct)
         if what_part.empty?
           return placekey
+          
+        # Case 2: Handle numeric prefixes from API responses first
+        # This handles patterns like "23b@", "123@", "123abc@" which should be
+        # converted to just "@where" format according to tests
+        elsif what_part.match?(NUMERIC_PREFIX_PATTERN)
+          return "@#{where_part}"
         
-        # Case 2: Check for valid What part patterns that need formatting
-        # Handle special cases for valid 6-char or 3-char What parts
-        elsif what_part.match?(VALID_WHAT_PATTERN) && !what_part.include?('-')
-          if what_part.length == 6
+        # Case 3: Check for valid What part patterns that need formatting
+        # But only if they don't match the numeric prefix pattern
+        elsif !what_part.include?('-')
+          if what_part.length == 6 && what_part.match?(/^[23456789bcdfghjkmnpqrstvwxyz]{6}$/)
             # Format 6-char What parts as two triplets with a dash
             formatted_what = "#{what_part[0..2]}-#{what_part[3..5]}"
             return "#{formatted_what}@#{where_part}"
-          elsif what_part.length == 3
+          elsif what_part.length == 3 && what_part.match?(/^[23456789bcdfghjkmnpqrstvwxyz]{3}$/)
             # Format 3-char What parts with a trailing dash
             return "#{what_part}-@#{where_part}"
           end
-        
-        # Case 3: Handle numeric prefixes from API responses
-        # This handles patterns like "23b@", "123@", "123abc@" which should be
-        # converted to just "@where" format according to tests
-        elsif what_part.match?(/^\d+[a-z]*$/)
-          return "@#{where_part}"
         end
       else
         # Case 4: Where part without @ symbol (like "5vg-82n-kzz")
