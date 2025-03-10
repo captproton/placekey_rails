@@ -9,7 +9,7 @@ module PlacekeyRails
     # Regular expressions for placekey validation
     WHERE_REGEX = /^[23456789bcdfghjkmnpqrstvwxyz]{3}-[23456789bcdfghjkmnpqrstvwxyz]{3}-[23456789bcdfghjkmnpqrstvwxyz]{3}$/
     WHAT_REGEX_V1 = /^[23456789bcdfghjkmnpqrstvwxyz]{3,}-[23456789bcdfghjkmnpqrstvwxyz]{3,}$/
-    WHAT_REGEX_V2 = /^[01][abcdefghijklmnopqrstvwxyz234567]{9}$/
+    WHAT_REGEX_V2 = /^[01][abcdefghijklmnopqrstuvwxyz234567]{9}$/
     PLACEKEY_REGEX = /^(@|[23456789bcdfghjkmnpqrstvwxyz]{3,}-[23456789bcdfghjkmnpqrstvwxyz]{3,}@)?[23456789bcdfghjkmnpqrstvwxyz]{3}-[23456789bcdfghjkmnpqrstvwxyz]{3}-[23456789bcdfghjkmnpqrstvwxyz]{3}$/
 
     def placekey_format_is_valid(placekey)
@@ -77,47 +77,52 @@ module PlacekeyRails
     def normalize_placekey_format(placekey)
       return placekey unless placekey.is_a?(String)
       return placekey if placekey.blank?
-
-      if placekey.include?("@")
-        parts = placekey.split("@", 2)
+      
+      if placekey.include?('@')
+        parts = placekey.split('@', 2)
         what_part = parts[0]
         where_part = parts[1]
-
+        
         # Case 1: @where format (already correct)
         if what_part.empty?
           return placekey
-
-        # Case 3: Proper what part but missing dash in a 6-char sequence
-        # Like "223227@xxx-xxx-xxx" should be "223-227@xxx-xxx-xxx"
-        elsif what_part.match?(/^[23456789bcdfghjkmnpqrstvwxyz]{6}$/) && !what_part.include?("-")
-          # Split into two triplets if exactly 6 characters
-          formatted_what = "#{what_part[0..2]}-#{what_part[3..5]}"
-          return "#{formatted_what}@#{where_part}"
-
-        # Case 4: Single address code without POI code and missing dash
-        # Like "223@xxx-xxx-xxx" should be "223-@xxx-xxx-xxx"
-        elsif what_part.match?(/^[23456789bcdfghjkmnpqrstvwxyz]{3}$/) && !what_part.include?("-")
-          # Add a dash to follow the format in the white paper
-          return "#{what_part}-@#{where_part}"
-
+          
         # Case 2: Numeric prefix - convert to @where format
         # API sometimes returns formats like "23b@5vg-849-gp9"
         # According to the white paper, these should be "@where" format
+        elsif what_part.match?(/^\d+[a-z]?$/)
+          return "@#{where_part}"
+        
+        # Case 3: Proper what part but missing dash in a 6-character sequence
+        # Like "223227@xxx-xxx-xxx" should be "223-227@xxx-xxx-xxx"
+        elsif what_part.match?(/^[23456789bcdfghjkmnpqrstvwxyz]{6}$/) && !what_part.include?('-')
+          # Split into two triplets if exactly 6 characters
+          formatted_what = "#{what_part[0..2]}-#{what_part[3..5]}"
+          return "#{formatted_what}@#{where_part}"
+          
+        # Case 4: Single address code without POI code and missing dash
+        # Like "223@xxx-xxx-xxx" should be "223-@xxx-xxx-xxx"
+        elsif what_part.match?(/^[23456789bcdfghjkmnpqrstvwxyz]{3}$/) && !what_part.include?('-')
+          # Add a dash to follow the format in the white paper
+          return "#{what_part}-@#{where_part}"
+          
+        # Case 5: More general numeric prefix handling (multiple letters after digits)
+        # Like "123abc@xxx-xxx-xxx" should be "@xxx-xxx-xxx"
         elsif what_part.match?(/^\d+[a-z]*$/)
           return "@#{where_part}"
         end
       else
-        # Case 5: Where part without @ symbol (like "5vg-82n-kzz")
+        # Case 6: Where part without @ symbol (like "5vg-82n-kzz")
         # Add the @ prefix for standard format
         if WHERE_REGEX.match?(placekey)
           return "@#{placekey}"
         end
       end
-
+      
       # Return original if we can't normalize it
       placekey
     end
-
+    
     # Validate a placekey after normalizing it
     # This is useful for validating placekeys that might come from the API
     # in non-standard formats
