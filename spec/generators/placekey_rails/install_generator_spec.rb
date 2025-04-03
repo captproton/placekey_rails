@@ -14,7 +14,7 @@ RSpec.describe PlacekeyRails::Generators::InstallGenerator, type: :generator do
       before { run_generator }
       
       it "creates an initializer file" do
-        expect(destination_root).to have_structure {
+        expect(destination_root).to have_structure do
           directory "config" do
             directory "initializers" do
               file "placekey_rails.rb" do
@@ -23,7 +23,7 @@ RSpec.describe PlacekeyRails::Generators::InstallGenerator, type: :generator do
               end
             end
           end
-        }
+        end
       end
     end
     
@@ -31,7 +31,7 @@ RSpec.describe PlacekeyRails::Generators::InstallGenerator, type: :generator do
       before { run_generator %w[--api_key=test_api_key] }
       
       it "creates an initializer with the API key" do
-        expect(destination_root).to have_structure {
+        expect(destination_root).to have_structure do
           directory "config" do
             directory "initializers" do
               file "placekey_rails.rb" do
@@ -39,7 +39,7 @@ RSpec.describe PlacekeyRails::Generators::InstallGenerator, type: :generator do
               end
             end
           end
-        }
+        end
       end
     end
     
@@ -47,13 +47,13 @@ RSpec.describe PlacekeyRails::Generators::InstallGenerator, type: :generator do
       before { run_generator %w[--skip_initializer] }
       
       it "does not create an initializer" do
-        expect(destination_root).not_to have_structure {
+        expect(destination_root).not_to have_structure do
           directory "config" do
             directory "initializers" do
               file "placekey_rails.rb"
             end
           end
-        }
+        end
       end
     end
   end
@@ -67,7 +67,7 @@ RSpec.describe PlacekeyRails::Generators::InstallGenerator, type: :generator do
       end
       
       it "creates a new model" do
-        expect(destination_root).to have_structure {
+        expect(destination_root).to have_structure do
           directory "app" do
             directory "models" do
               file "location.rb" do
@@ -76,7 +76,7 @@ RSpec.describe PlacekeyRails::Generators::InstallGenerator, type: :generator do
               end
             end
           end
-        }
+        end
       end
       
       it "creates a migration for the new model" do
@@ -104,7 +104,7 @@ RSpec.describe PlacekeyRails::Generators::InstallGenerator, type: :generator do
       end
       
       it "modifies the existing model" do
-        expect(destination_root).to have_structure {
+        expect(destination_root).to have_structure do
           directory "app" do
             directory "models" do
               file "location.rb" do
@@ -113,7 +113,7 @@ RSpec.describe PlacekeyRails::Generators::InstallGenerator, type: :generator do
               end
             end
           end
-        }
+        end
       end
       
       it "creates a migration to add placekey column" do
@@ -154,7 +154,7 @@ RSpec.describe PlacekeyRails::Generators::InstallGenerator, type: :generator do
       end
       
       it "adds import to application.js" do
-        expect(destination_root).to have_structure {
+        expect(destination_root).to have_structure do
           directory "app" do
             directory "javascript" do
               file "application.js" do
@@ -162,7 +162,7 @@ RSpec.describe PlacekeyRails::Generators::InstallGenerator, type: :generator do
               end
             end
           end
-        }
+        end
       end
     end
     
@@ -189,7 +189,7 @@ RSpec.describe PlacekeyRails::Generators::InstallGenerator, type: :generator do
     end
     
     it "creates a venue model" do
-      expect(destination_root).to have_structure {
+      expect(destination_root).to have_structure do
         directory "app" do
           directory "models" do
             file "venue.rb" do
@@ -197,8 +197,8 @@ RSpec.describe PlacekeyRails::Generators::InstallGenerator, type: :generator do
               contains "include PlacekeyRails::Concerns::Placekeyable"
             end
           end
-        }
-      }
+        end
+      end
     end
     
     it "creates a migration for venues" do
