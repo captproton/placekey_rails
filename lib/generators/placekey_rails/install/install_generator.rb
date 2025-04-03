@@ -1,3 +1,6 @@
+require 'rails/generators'
+require 'rails/generators/base'
+
 module PlacekeyRails
   module Generators
     class InstallGenerator < Rails::Generators::Base

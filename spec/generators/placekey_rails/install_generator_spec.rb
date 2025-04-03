@@ -1,4 +1,7 @@
 require 'spec_helper'
+require 'rails'
+require 'rails/generators'
+require 'rails/generators/test_case'
 require 'generators/placekey_rails/install/install_generator'
 
 RSpec.describe PlacekeyRails::Generators::InstallGenerator, type: :generator do
