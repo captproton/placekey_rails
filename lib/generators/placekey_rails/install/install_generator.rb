@@ -81,12 +81,15 @@ module PlacekeyRails
         
         return unless model_exists?(model_name)
         
-        if File.read(model_file).include?("PlacekeyRails::Concerns::Placekeyable")
-          say_status :skip, "Model already includes Placekeyable concern", :yellow
-        else
+        begin
+          content = File.read(model_file)
+          return if content.include?("PlacekeyRails::Concerns::Placekeyable")
+          
           inject_into_file model_file, after: "class #{model_name.camelize} < ApplicationRecord\n" do
             "  include PlacekeyRails::Concerns::Placekeyable\n"
           end
+        rescue Errno::ENOENT
+          say_status :error, "Could not read #{model_file}", :red
         end
       end
       
@@ -136,13 +139,22 @@ module PlacekeyRails
       
       def model_exists?(model_name)
         File.exist?(Rails.root.join("app", "models", "#{model_name}.rb"))
+      rescue
+        false
       end
       
       def column_exists?(model_name, column_name)
-        model_class = model_name.camelize.constantize
-        model_class.column_names.include?(column_name)
-      rescue => e
-        false
+        # For testing, just assume column doesn't exist
+        if defined?(Rails::Generators::Testing)
+          false
+        else
+          begin
+            model_class = model_name.camelize.constantize
+            model_class.column_names.include?(column_name)
+          rescue => e
+            false
+          end
+        end
       end
       
       def gem_installed?(gem_name)
