@@ -113,7 +113,7 @@ module GeneratorSpecHelpers
   end
 
   def run_generator(args = [])
-    args += ["--quiet"] unless args.include?("--quiet")
+    args += [ "--quiet" ] unless args.include?("--quiet")
     generator_class.start(args, destination_root: destination_root)
   end
 end
