@@ -3,7 +3,8 @@ module PlacekeyRails
     class InstallGenerator < Rails::Generators::Base
       source_root File.expand_path("templates", __dir__)
       
-      class_option :api_key, type: :string, desc: "Your Placekey API key (optional)"
+      class_option :api_key, type: :string, desc: "Your Placekey API key (not recommended, use credentials instead)"
+      class_option :use_dotenv, type: :boolean, default: false, desc: "Configure to use dotenv instead of credentials"
       class_option :skip_initializer, type: :boolean, default: false, desc: "Skip initializer creation"
       class_option :skip_migration, type: :boolean, default: false, desc: "Skip migration creation"
       class_option :skip_model, type: :boolean, default: false, desc: "Skip model modification"
@@ -14,6 +15,37 @@ module PlacekeyRails
         return if options[:skip_initializer]
         
         template "initializer.rb", "config/initializers/placekey_rails.rb"
+      end
+      
+      def setup_credentials
+        return if options[:skip_initializer] || options[:api_key].present? || options[:use_dotenv]
+        
+        say_status :info, "To add your Placekey API key to credentials, run:", :blue
+        say "\n  rails credentials:edit\n"
+        say "Then add this to your credentials file:"
+        say <<~YAML
+
+          placekey:
+            api_key: your_api_key_here
+        YAML
+      end
+      
+      def setup_dotenv
+        return if options[:skip_initializer] || options[:api_key].present? || !options[:use_dotenv]
+        
+        unless File.exist?(Rails.root.join(".env"))
+          template "dotenv", ".env"
+        end
+        
+        unless File.exist?(Rails.root.join(".env.example"))
+          template "dotenv.example", ".env.example"
+        end
+        
+        unless gem_installed?("dotenv-rails")
+          say_status :warning, "Please add dotenv-rails to your Gemfile:", :yellow
+          say "\n  gem 'dotenv-rails', groups: [:development, :test, :production]\n"
+          say "Then run: bundle install"
+        end
       end
       
       def create_migration
@@ -92,12 +124,6 @@ module PlacekeyRails
           say "     bin/rails db:migrate"
         end
         
-        unless options[:skip_initializer]
-          if options[:api_key].blank?
-            say "  2. Configure your Placekey API key in config/initializers/placekey_rails.rb"
-          end
-        end
-        
         say "\n"
         say "For more information, check out the PlacekeyRails documentation:"
         say "  https://github.com/captproton/placekey_rails\n"
@@ -114,6 +140,10 @@ module PlacekeyRails
         model_class.column_names.include?(column_name)
       rescue => e
         false
+      end
+      
+      def gem_installed?(gem_name)
+        Gem::Specification.find_all_by_name(gem_name).any?
       end
     end
   end

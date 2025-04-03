@@ -68,16 +68,40 @@ For detailed installation instructions, including platform-specific setups, see 
 PlacekeyRails comes with a generator to automate the setup process. After adding the gem to your Gemfile and running `bundle install`, you can use the generator to quickly set up the gem:
 
 ```bash
-# Basic installation
+# Basic installation (uses Rails credentials for API key)
 rails generate placekey_rails:install
+```
 
-# With your API key
+This will configure the gem to use Rails credentials for secure API key storage. After running the generator, add your key to credentials:
+
+```bash
+rails credentials:edit
+```
+
+Then add this to your credentials file:
+
+```yaml
+placekey:
+  api_key: your_api_key_here
+```
+
+#### Alternative API Key Options
+
+```bash
+# Use environment variables with dotenv
+rails generate placekey_rails:install --use_dotenv
+
+# Direct API key (not recommended for production)
 rails generate placekey_rails:install --api_key=your_api_key_here
+```
 
+#### Customization Options
+
+```bash
 # Specify a different model name (default is 'location')
 rails generate placekey_rails:install --model=venue
 
-# Only set up specific components
+# Skip specific components
 rails generate placekey_rails:install --skip_migration --skip_javascript
 ```
 
@@ -97,12 +121,15 @@ rails db:migrate
 
 | Option | Description |
 | ------ | ----------- |
-| `--api_key=KEY` | Your Placekey API key |
+| `--use_dotenv` | Use dotenv for API key management instead of credentials |
+| `--api_key=KEY` | Your Placekey API key (not recommended for production) |
 | `--model=NAME` | Model name to use for Placekey integration (default: location) |
 | `--skip_initializer` | Skip creating the initializer |
 | `--skip_migration` | Skip creating the migration |
 | `--skip_model` | Skip updating the model |
 | `--skip_javascript` | Skip setting up JavaScript |
+
+For detailed information on the generator, see [Install Generator Documentation](docs/INSTALL_GENERATOR.md).
 
 ## Requirements
 
@@ -306,6 +333,7 @@ For detailed documentation, please see:
 
 - [Quick Start Guide](docs/QUICK_START.md) - Get up and running quickly
 - [Installation Guide](docs/INSTALLATION.md) - Detailed platform-specific installation instructions
+- [Install Generator Documentation](docs/INSTALL_GENERATOR.md) - How to use the install generator
 - [API Reference](docs/API_REFERENCE.md) - Complete reference for all gem methods
 - [Examples](docs/EXAMPLES.md) - Detailed examples of using the gem
 - [ActiveRecord Integration](docs/ACTIVERECORD_INTEGRATION.md) - Using with models

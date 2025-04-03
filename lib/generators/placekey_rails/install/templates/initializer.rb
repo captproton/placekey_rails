@@ -3,10 +3,20 @@
 
 # Set up the API client with your Placekey API key
 <% if options[:api_key].present? %>
+# SECURITY NOTE: Storing API keys directly in code is not recommended for production.
+# Consider using Rails credentials or environment variables instead.
 PlacekeyRails.setup_client("<%= options[:api_key] %>")
+<% elsif options[:use_dotenv] %>
+# Using dotenv for API key management
+# Make sure you have dotenv-rails gem installed and PLACEKEY_API_KEY in your .env file
+PlacekeyRails.setup_client(ENV["PLACEKEY_API_KEY"])
 <% else %>
-# PlacekeyRails.setup_client("YOUR_API_KEY")
-# You can get an API key from https://placekey.io
+# Using Rails credentials for secure API key storage
+# Add your key to credentials with: rails credentials:edit
+# Format:
+# placekey:
+#   api_key: your_key_here
+PlacekeyRails.setup_client(Rails.application.credentials.dig(:placekey, :api_key))
 <% end %>
 
 # Enable caching to improve performance (recommended)

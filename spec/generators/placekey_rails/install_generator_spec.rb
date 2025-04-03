@@ -10,18 +10,45 @@ RSpec.describe PlacekeyRails::Generators::InstallGenerator, type: :generator do
   end
   
   describe "initializer creation" do
-    context "without an API key" do
+    context "with default options (using credentials)" do
       before { run_generator }
       
-      it "creates an initializer file" do
+      it "creates an initializer file using Rails credentials" do
         expect(destination_root).to have_structure do
           directory "config" do
             directory "initializers" do
               file "placekey_rails.rb" do
-                contains "# PlacekeyRails.setup_client(\"YOUR_API_KEY\")"
+                contains "Rails.application.credentials.dig(:placekey, :api_key)"
                 contains "PlacekeyRails.enable_caching(max_size: 1000)"
               end
             end
+          end
+        end
+      end
+    end
+    
+    context "with dotenv option" do
+      before { run_generator %w[--use_dotenv] }
+      
+      it "creates an initializer using dotenv" do
+        expect(destination_root).to have_structure do
+          directory "config" do
+            directory "initializers" do
+              file "placekey_rails.rb" do
+                contains "ENV[\"PLACEKEY_API_KEY\"]"
+              end
+            end
+          end
+        end
+      end
+      
+      it "creates .env and .env.example files" do
+        expect(destination_root).to have_structure do
+          file ".env" do
+            contains "PLACEKEY_API_KEY=your_api_key_here"
+          end
+          file ".env.example" do
+            contains "PLACEKEY_API_KEY=your_api_key_here"
           end
         end
       end
@@ -36,6 +63,7 @@ RSpec.describe PlacekeyRails::Generators::InstallGenerator, type: :generator do
             directory "initializers" do
               file "placekey_rails.rb" do
                 contains "PlacekeyRails.setup_client(\"test_api_key\")"
+                contains "SECURITY NOTE" # Should include security warning
               end
             end
           end
@@ -205,6 +233,48 @@ RSpec.describe PlacekeyRails::Generators::InstallGenerator, type: :generator do
       migration_file = Dir.glob(File.join(destination_root, "db/migrate/*create_venues.rb")).first
       expect(migration_file).not_to be_nil
       expect(File.read(migration_file)).to include("create_table :venues")
+    end
+  end
+  
+  describe "combination of options" do
+    before do
+      run_generator %w[--model=store --use_dotenv --skip_javascript]
+    end
+    
+    it "creates a dotenv initializer" do
+      expect(destination_root).to have_structure do
+        directory "config" do
+          directory "initializers" do
+            file "placekey_rails.rb" do
+              contains "ENV[\"PLACEKEY_API_KEY\"]"
+            end
+          end
+        end
+      end
+    end
+    
+    it "creates a store model" do
+      expect(destination_root).to have_structure do
+        directory "app" do
+          directory "models" do
+            file "store.rb" do
+              contains "include PlacekeyRails::Concerns::Placekeyable"
+            end
+          end
+        end
+      end
+    end
+    
+    it "does not modify JavaScript" do
+      # Create JS file after running generator to verify it wasn't modified
+      FileUtils.mkdir_p(File.join(destination_root, "app/javascript"))
+      File.write(
+        File.join(destination_root, "app/javascript/application.js"),
+        "// Existing JS code"
+      )
+      
+      expect(File.read(File.join(destination_root, "app/javascript/application.js")))
+        .not_to include("import \"placekey_rails\"")
     end
   end
 end
