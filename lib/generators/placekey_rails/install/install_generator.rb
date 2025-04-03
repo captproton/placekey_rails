@@ -96,17 +96,32 @@ module PlacekeyRails
       def setup_javascript
         return if options[:skip_javascript]
         
-        if File.exist?("app/javascript/application.js")
-          import_path = "app/javascript/application.js"
-          unless File.read(import_path).include?("placekey_rails")
-            append_file import_path, "\n// Import PlacekeyRails JavaScript components\nimport \"placekey_rails\"\n"
+        # Handle application.js
+        if File.exist?(File.join(destination_root, "app/javascript/application.js"))
+          js_file = File.join(destination_root, "app/javascript/application.js")
+          current_content = File.read(js_file)
+          
+          # Only append if import doesn't already exist
+          unless current_content.include?("placekey_rails")
+            new_content = current_content + "\n// Import PlacekeyRails JavaScript components\nimport \"placekey_rails\"\n"
+            # Write the file directly instead of using append_file
+            File.write(js_file, new_content)
           end
-        elsif File.exist?("app/javascript/packs/application.js")
-          import_path = "app/javascript/packs/application.js"
-          unless File.read(import_path).include?("placekey_rails")
-            append_file import_path, "\n// Import PlacekeyRails JavaScript components\nimport \"placekey_rails\"\n"
+          
+        # Handle packs/application.js
+        elsif File.exist?(File.join(destination_root, "app/javascript/packs/application.js"))
+          js_file = File.join(destination_root, "app/javascript/packs/application.js")
+          current_content = File.read(js_file)
+          
+          # Only append if import doesn't already exist
+          unless current_content.include?("placekey_rails")
+            new_content = current_content + "\n// Import PlacekeyRails JavaScript components\nimport \"placekey_rails\"\n"
+            # Write the file directly instead of using append_file
+            File.write(js_file, new_content)
           end
-        elsif Dir.exist?("app/javascript")
+          
+        # Handle directories without js files
+        elsif Dir.exist?(File.join(destination_root, "app/javascript"))
           create_file "app/javascript/placekey_rails_integration.js", "// Import PlacekeyRails JavaScript components\nimport \"placekey_rails\"\n"
           say_status :warning, "Created placekey_rails_integration.js - make sure to import it in your JavaScript entry point", :yellow
         else

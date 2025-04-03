@@ -27,7 +27,6 @@ RSpec.describe PlacekeyRails::Generators::InstallGenerator do
   # Helper to run the generator
   def run_generator(args = [])
     generator_args = args.dup
-    generator_args << "--quiet" # Suppress output in tests
     generator_args << "--skip-model" # Skip model operations by default to avoid file issues
     PlacekeyRails::Generators::InstallGenerator.start(generator_args, destination_root: destination)
   end
@@ -120,14 +119,18 @@ RSpec.describe PlacekeyRails::Generators::InstallGenerator do
           "// Existing JS code"
         )
         
-        # Then run the generator
+        # Then run the generator without the quiet flag
         run_generator
       end
       
       it "adds import to application.js" do
         js_path = File.join(destination, "app/javascript/application.js")
-        content = File.read(js_path)
-        expect(content).to include("import \"placekey_rails\"")
+        
+        # Debugging output
+        puts "JavaScript content after generator:"
+        puts File.read(js_path)
+        
+        expect(File.read(js_path)).to include("import \"placekey_rails\"")
       end
     end
     
