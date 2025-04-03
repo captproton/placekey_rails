@@ -26,10 +26,6 @@ load File.expand_path('../lib/placekey_rails/spatial.rb', __dir__)
 # For generator tests, set up Rails
 require 'rails'
 require 'rails/generators'
-require 'rails/generators/test_case'
-
-# Support for generator tests
-require File.expand_path("./support/generator_spec_helper", __dir__)
 
 # Create a minimal module structure for testing
 module PlacekeyRails
