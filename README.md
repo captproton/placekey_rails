@@ -63,6 +63,47 @@ $ gem install placekey_rails
 
 For detailed installation instructions, including platform-specific setups, see our [Installation Guide](docs/INSTALLATION.md).
 
+### Using the Install Generator
+
+PlacekeyRails comes with a generator to automate the setup process. After adding the gem to your Gemfile and running `bundle install`, you can use the generator to quickly set up the gem:
+
+```bash
+# Basic installation
+rails generate placekey_rails:install
+
+# With your API key
+rails generate placekey_rails:install --api_key=your_api_key_here
+
+# Specify a different model name (default is 'location')
+rails generate placekey_rails:install --model=venue
+
+# Only set up specific components
+rails generate placekey_rails:install --skip_migration --skip_javascript
+```
+
+The generator will:
+1. Create an initializer in `config/initializers/placekey_rails.rb`
+2. Create a migration to add a `placekey` column to your model (or create the model if it doesn't exist)
+3. Update your model to include the `Placekeyable` concern
+4. Set up JavaScript integration
+
+After running the generator, apply the migration with:
+
+```bash
+rails db:migrate
+```
+
+#### Generator Options
+
+| Option | Description |
+| ------ | ----------- |
+| `--api_key=KEY` | Your Placekey API key |
+| `--model=NAME` | Model name to use for Placekey integration (default: location) |
+| `--skip_initializer` | Skip creating the initializer |
+| `--skip_migration` | Skip creating the migration |
+| `--skip_model` | Skip updating the model |
+| `--skip_javascript` | Skip setting up JavaScript |
+
 ## Requirements
 
 The gem requires:
