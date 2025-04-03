@@ -23,6 +23,10 @@ load File.expand_path('../lib/placekey_rails/converter.rb', __dir__)
 load File.expand_path('../lib/placekey_rails/validator.rb', __dir__)
 load File.expand_path('../lib/placekey_rails/spatial.rb', __dir__)
 
+# For generator tests, set up Rails
+require 'rails'
+require 'rails/generators'
+
 # Create a minimal module structure for testing
 module PlacekeyRails
   module Concerns

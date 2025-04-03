@@ -63,6 +63,74 @@ $ gem install placekey_rails
 
 For detailed installation instructions, including platform-specific setups, see our [Installation Guide](docs/INSTALLATION.md).
 
+### Using the Install Generator
+
+PlacekeyRails comes with a generator to automate the setup process. After adding the gem to your Gemfile and running `bundle install`, you can use the generator to quickly set up the gem:
+
+```bash
+# Basic installation (uses Rails credentials for API key)
+rails generate placekey_rails:install
+```
+
+This will configure the gem to use Rails credentials for secure API key storage. After running the generator, add your key to credentials:
+
+```bash
+rails credentials:edit
+```
+
+Then add this to your credentials file:
+
+```yaml
+placekey:
+  api_key: your_api_key_here
+```
+
+#### Alternative API Key Options
+
+```bash
+# Use environment variables with dotenv
+rails generate placekey_rails:install --use_dotenv
+
+# Direct API key (not recommended for production)
+rails generate placekey_rails:install --api_key=your_api_key_here
+```
+
+#### Customization Options
+
+```bash
+# Specify a different model name (default is 'location')
+rails generate placekey_rails:install --model=venue
+
+# Skip specific components
+rails generate placekey_rails:install --skip_migration --skip_javascript
+```
+
+The generator will:
+1. Create an initializer in `config/initializers/placekey_rails.rb`
+2. Create a migration to add a `placekey` column to your model (or create the model if it doesn't exist)
+3. Update your model to include the `Placekeyable` concern
+4. Set up JavaScript integration
+
+After running the generator, apply the migration with:
+
+```bash
+rails db:migrate
+```
+
+#### Generator Options
+
+| Option | Description |
+| ------ | ----------- |
+| `--use_dotenv` | Use dotenv for API key management instead of credentials |
+| `--api_key=KEY` | Your Placekey API key (not recommended for production) |
+| `--model=NAME` | Model name to use for Placekey integration (default: location) |
+| `--skip_initializer` | Skip creating the initializer |
+| `--skip_migration` | Skip creating the migration |
+| `--skip_model` | Skip updating the model |
+| `--skip_javascript` | Skip setting up JavaScript |
+
+For detailed information on the generator, see [Install Generator Documentation](docs/INSTALL_GENERATOR.md).
+
 ## Requirements
 
 The gem requires:
@@ -265,6 +333,7 @@ For detailed documentation, please see:
 
 - [Quick Start Guide](docs/QUICK_START.md) - Get up and running quickly
 - [Installation Guide](docs/INSTALLATION.md) - Detailed platform-specific installation instructions
+- [Install Generator Documentation](docs/INSTALL_GENERATOR.md) - How to use the install generator
 - [API Reference](docs/API_REFERENCE.md) - Complete reference for all gem methods
 - [Examples](docs/EXAMPLES.md) - Detailed examples of using the gem
 - [ActiveRecord Integration](docs/ACTIVERECORD_INTEGRATION.md) - Using with models
